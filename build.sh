@@ -21,8 +21,9 @@ sleep 3
 # Downloading necessary files for building
 #--------------------------------------------------------------------------------
 echo "------ Downloading necessary files"
-apt-get -qq -y install binfmt-support bison build-essential ccache debootstrap flex gawk gcc-4.6-multilib-arm-linux-gnueabi gcc-4.6-multilib-arm-linux-gnueabihf gettext linux-headers-generic-lts-saucy linux-image-generic-lts-saucy lvm2 qemu-user-static texinfo texlive u-boot-tools uuid-dev zlib1g-dev unzip libncurses5-dev pkg-config libusb-1.0-0-dev
-
+#Read this for further information if you run into problems with gcc compiler
+#http://linux-sunxi.org/Toolchain
+apt-get -qq -y install binfmt-support bison build-essential ccache debootstrap flex gawk gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gettext linux-headers-generic linux-image-generic lvm2 qemu-user-static texinfo texlive u-boot-tools uuid-dev zlib1g-dev unzip libncurses5-dev pkg-config libusb-1.0-0-dev
 #--------------------------------------------------------------------------------
 # Preparing output / destination files
 #--------------------------------------------------------------------------------
