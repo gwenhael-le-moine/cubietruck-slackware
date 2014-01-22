@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # --- Configuration -------------------------------------------------------------
-VERSION="CTDebian 1.4"
-DEST_LANG="en_US"
-DEST_LANGUAGE="en"
+VERSION="ArchLinux_0.1"
+DEST_LANG="de_DE"
+DEST_LANGUAGE="de"
 DEST=/tmp/Cubie
-DISPLAY=4  # "3:hdmi; 4:vga"
+DISPLAY=3  # "3:hdmi; 4:vga"
 # --- End -----------------------------------------------------------------------
 SRC=$(pwd)
 set -e
@@ -15,10 +15,10 @@ if [ "$UID" -ne 0 ]
   then echo "Please run as root"
   exit
 fi
-echo "Building Cubietruck-Debian in $DEST from $SRC"
+echo "Building Cubietruck-Arch in $DEST from $SRC"
 sleep 3
 #--------------------------------------------------------------------------------
-# Downloading necessary files
+# Downloading necessary files for building
 #--------------------------------------------------------------------------------
 echo "------ Downloading necessary files"
 apt-get -qq -y install binfmt-support bison build-essential ccache debootstrap flex gawk gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gettext linux-headers-generic linux-image-generic lvm2 qemu-user-static texinfo texlive u-boot-tools uuid-dev zlib1g-dev unzip libncurses5-dev pkg-config libusb-1.0-0-dev
@@ -115,9 +115,9 @@ make -j2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- INSTALL_HDR_PATH=output hea
 echo "------ Creating SD Images"
 cd $DEST/output
 # create 1Gb image and mount image to next free loop device
-dd if=/dev/zero of=debian_rootfs.raw bs=1M count=1000
+dd if=/dev/zero of=arch_rootfs.raw bs=1M count=1000
 LOOP0=$(losetup -f)
-losetup $LOOP0 debian_rootfs.raw 
+losetup $LOOP0 arch_rootfs.raw 
 
 echo "------ Partitionning and mounting filesystem"
 # make image bootable
@@ -139,23 +139,26 @@ mount $LOOP1 $DEST/output/sdcard/
 
 echo "------ Install basic filesystem"
 # install base system
-debootstrap --no-check-gpg --arch=armhf --foreign wheezy $DEST/output/sdcard/
+#debootstrap --no-check-gpg --arch=armhf --foreign wheezy $DEST/output/sdcard/
+#fetching latest Arch-Image for ARMv7 Allwinner Platform for the root filesystem
+wget -q -P $DEST/output/sdcard/ -O - http://archlinuxarm.org/os/ArchLinuxARM-sun7i-latest.tar.gz | tar -xzf -
+sync
 # we need this
 cp /usr/bin/qemu-arm-static $DEST/output/sdcard/usr/bin/
 # mount proc inside chroot
-mount -t proc chproc $DEST/output/sdcard/proc
+#mount -t proc chproc $DEST/output/sdcard/proc
 # second stage unmounts proc 
-chroot $DEST/output/sdcard /bin/bash -c "/debootstrap/debootstrap --second-stage"
+#chroot $DEST/output/sdcard /bin/bash -c "/debootstrap/debootstrap --second-stage"
 # mount proc, sys and dev
-mount -t proc chproc $DEST/output/sdcard/proc
-mount -t sysfs chsys $DEST/output/sdcard/sys
+#mount -t proc chproc $DEST/output/sdcard/proc
+#mount -t sysfs chsys $DEST/output/sdcard/sys
 # This works on half the systems I tried.  Else use bind option
-mount -t devtmpfs chdev $DEST/output/sdcard/dev || mount --bind /dev $DEST/output/sdcard/dev
-mount -t devpts chpts $DEST/output/sdcard/dev/pts
+#mount -t devtmpfs chdev $DEST/output/sdcard/dev || mount --bind /dev $DEST/output/sdcard/dev
+#mount -t devpts chpts $DEST/output/sdcard/dev/pts
 
 # update /etc/issue
-cat <<EOT > $DEST/output/sdcard/etc/issue
-Debian GNU/Linux 7 $VERSION
+#cat <<EOT > $DEST/output/sdcard/etc/issue
+#Debian GNU/Linux 7 $VERSION
 
 EOT
 
@@ -172,24 +175,24 @@ EOF
 
 
 # apt list
-cat <<EOT > $DEST/output/sdcard/etc/apt/sources.list
-deb http://http.debian.net/debian wheezy main contrib non-free
-deb-src http://http.debian.net/debian wheezy main contrib non-free
-deb http://http.debian.net/debian wheezy-updates main contrib non-free
-deb-src http://http.debian.net/debian wheezy-updates main contrib non-free
-deb http://security.debian.org/debian-security wheezy/updates main contrib non-free
-deb-src http://security.debian.org/debian-security wheezy/updates main contrib non-free
-EOT
+#cat <<EOT > $DEST/output/sdcard/etc/apt/sources.list
+#deb http://http.debian.net/debian wheezy main contrib non-free
+#deb-src http://http.debian.net/debian wheezy main contrib non-free
+#deb http://http.debian.net/debian wheezy-updates main contrib non-free
+#deb-src http://http.debian.net/debian wheezy-updates main contrib non-free
+#deb http://security.debian.org/debian-security wheezy/updates main contrib non-free
+#deb-src http://security.debian.org/debian-security wheezy/updates main contrib non-free
+#EOT
 
 # update
-chroot $DEST/output/sdcard /bin/bash -c "apt-get update"
-chroot $DEST/output/sdcard /bin/bash -c "export LANG=C"    
+#chroot $DEST/output/sdcard /bin/bash -c "apt-get update"
+#chroot $DEST/output/sdcard /bin/bash -c "export LANG=C"    
 
 # set up 'apt
-cat <<END > $DEST/output/sdcard/etc/apt/apt.conf.d/71-no-recommends
-APT::Install-Recommends "0";
-APT::Install-Suggests "0";
-END
+#cat <<END > $DEST/output/sdcard/etc/apt/apt.conf.d/71-no-recommends
+#APT::Install-Recommends "0";
+#APT::Install-Suggests "0";
+#END
 
 # script to turn off the LED blinking
 cp $SRC/scripts/disable_led.sh $DEST/output/sdcard/etc/init.d/disable_led.sh
@@ -197,7 +200,7 @@ cp $SRC/scripts/disable_led.sh $DEST/output/sdcard/etc/init.d/disable_led.sh
 # make it executable
 chroot $DEST/output/sdcard /bin/bash -c "chmod +x /etc/init.d/disable_led.sh"
 # and startable on boot
-chroot $DEST/output/sdcard /bin/bash -c "update-rc.d disable_led.sh defaults" 
+#chroot $DEST/output/sdcard /bin/bash -c "update-rc.d disable_led.sh defaults" 
 
 # scripts for autoresize at first boot from cubian
 cd $DEST/output/sdcard/etc/init.d
@@ -205,28 +208,34 @@ cp $SRC/scripts/cubian-resize2fs $DEST/output/sdcard/etc/init.d
 cp $SRC/scripts/cubian-firstrun $DEST/output/sdcard/etc/init.d
 
 # script to install to NAND
-cp $SRC/scripts/nand-install.sh $DEST/output/sdcard/root
-cp $SRC/bin/nand1-cubietruck-debian-boot.tgz $DEST/output/sdcard/root
+#cp $SRC/scripts/nand-install.sh $DEST/output/sdcard/root
+#cp $SRC/bin/nand1-cubietruck-debian-boot.tgz $DEST/output/sdcard/root
 
 # make it executable
 chroot $DEST/output/sdcard /bin/bash -c "chmod +x /etc/init.d/cubian-*"
 # and startable on boot
 chroot $DEST/output/sdcard /bin/bash -c "update-rc.d cubian-firstrun defaults" 
-# install and configure locales
-chroot $DEST/output/sdcard /bin/bash -c "apt-get -qq -y install locales"
+# install and configure locales for Germany
+echo LANG='$DEST_LANG'.UTF-8 > $DEST/output/sdcard/etc/default/.conf
+echo KEYMAP=de-latin1-nodeadkeys > $DEST/output/sdcard/etc/vconsole.conf
+ln -s /usr/share/zoneinfo/Europe/Berlin $DEST/output/sdcard/etc/localtime
+#chroot $DEST/output/sdcard /bin/bash -c "pacman -S locales"
 # reconfigure locales
-echo -e $DEST_LANG'.UTF-8 UTF-8\n' > $DEST/output/sdcard/etc/locale.gen 
-chroot $DEST/output/sdcard /bin/bash -c "locale-gen"
-echo -e 'LANG="'$DEST_LANG'.UTF-8"\nLANGUAGE="'$DEST_LANG':'$DEST_LANGUAGE'"\n' > $DEST/output/sdcard/etc/default/locale
-chroot $DEST/output/sdcard /bin/bash -c "export LANG=$DEST_LANG.UTF-8"
-chroot $DEST/output/sdcard /bin/bash -c "apt-get -qq -y install git hostapd dosfstools htop openssh-server ca-certificates module-init-tools dhcp3-client udev ifupdown iproute iputils-ping ntpdate ntp rsync usbutils uboot-envtools pciutils wireless-tools wpasupplicant procps libnl-dev parted cpufrequtils console-setup unzip bridge-utils" 
-chroot $DEST/output/sdcard /bin/bash -c "apt-get -qq -y upgrade"
+#echo -e $DEST_LANG'.UTF-8 UTF-8\n' > $DEST/output/sdcard/etc/locale.gen 
+#chroot $DEST/output/sdcard /bin/bash -c "locale-gen"
+#echo -e 'LANG="'$DEST_LANG'.UTF-8"\nLANGUAGE="'$DEST_LANG':'$DEST_LANGUAGE'"\n' > $DEST/output/sdcard/etc/default/locale
+#chroot $DEST/output/sdcard /bin/bash -c "export LANG=$DEST_LANG.UTF-8"
+#chroot $DEST/output/sdcard /bin/bash -c "apt-get -qq -y install git hostapd dosfstools htop openssh-server ca-certificates module-init-tools dhcp3-client udev ifupdown iproute iputils-ping ntpdate ntp rsync usbutils uboot-envtools pciutils wireless-tools wpasupplicant procps libnl-dev parted cpufrequtils console-setup unzip bridge-utils" 
+#chroot $DEST/output/sdcard /bin/bash -c "apt-get -qq -y upgrade"
 
 # configure MIN / MAX Speed for cpufrequtils
 sed -e 's/MIN_SPEED="0"/MIN_SPEED="480000"/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
 sed -e 's/MAX_SPEED="0"/MAX_SPEED="1010000"/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
+#overclocked
+#sed -e 's/MAX_SPEED="0"/MAX_SPEED="1200000"/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
 sed -e 's/ondemand/interactive/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
 
+# i recommend you to change this urgently!!!
 # set password to 1234
 chroot $DEST/output/sdcard /bin/bash -c "(echo 1234;echo 1234;) | passwd root" 
 
@@ -241,12 +250,13 @@ bcmdhd
 #sunxi_gmac
 EOT
 
+# edit this for your personal needs/network configs
 # create interfaces configuration
 cat <<EOT >> $DEST/output/sdcard/etc/network/interfaces
 auto eth0
 allow-hotplug eth0
 iface eth0 inet dhcp
-        hwaddress ether AE:50:30:27:5A:CF # change this
+#        hwaddress ether AE:50:30:27:5A:CF # change this
 #        pre-up /sbin/ifconfig eth0 mtu 3838 # setting MTU for DHCP, static just: mtu 3838
 #auto wlan0
 #allow-hotplug wlan0
@@ -258,23 +268,26 @@ EOT
 
 
 # create interfaces if you want to have AP. /etc/modules must be: bcmdhd op_mode=2
-cat <<EOT >> $DEST/output/sdcard/etc/network/interfaces.hostapd
-auto lo br0
-iface lo inet loopback
+#cat <<EOT >> $DEST/output/sdcard/etc/network/interfaces.hostapd
+#auto lo br0
+#iface lo inet loopback
 
-allow-hotplug eth0
-iface eth0 inet manual
+#allow-hotplug eth0
+#iface eth0 inet manual
 
-allow-hotplug wlan0
-iface wlan0 inet manual
+#allow-hotplug wlan0
+#iface wlan0 inet manual
 
-iface br0 inet dhcp
-bridge_ports eth0 wlan0
-EOT
+#iface br0 inet dhcp
+#bridge_ports eth0 wlan0
+#EOT
 
 # enable serial console (Debian/sysvinit way)
 echo T0:2345:respawn:/sbin/getty -L ttyS0 115200 vt100 >> $DEST/output/sdcard/etc/inittab
 
+#remove the preconfigured boot from the image and use the one we want
+rm -rf $DEST/output/sdcard/boot/
+mkdir $DEST/output/sdcard/boot/
 cp $DEST/output/uEnv.txt $DEST/output/sdcard/boot/
 cp $DEST/linux-sunxi/arch/arm/boot/uImage $DEST/output/sdcard/boot/
 
@@ -287,12 +300,6 @@ fi
 
 cp -R $DEST/linux-sunxi/output/lib/modules $DEST/output/sdcard/lib/
 cp -R $DEST/linux-sunxi/output/lib/firmware/ $DEST/output/sdcard/lib/
-
-#cd $DEST/output/sdcard/lib/firmware
-#wget https://www.dropbox.com/s/o3evaiuidtg6xb5/ap6210.zip
-#unzip ap6210.zip
-#rm ap6210.zip
-#cd $DEST/
 
 # USB redirector tools http://www.incentivespro.com
 cd $DEST
