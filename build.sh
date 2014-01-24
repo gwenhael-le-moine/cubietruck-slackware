@@ -5,7 +5,8 @@
 VERSION="ArchLinux_0.1"
 DEST_LANG="de_DE"
 DEST_LANGUAGE="de"
-DEST=/tmp/Cubie
+mkdir ~/cubie
+DEST=~/cubie
 DISPLAY=3  # "3:hdmi; 4:vga"
 # --- End -----------------------------------------------------------------------
 SRC=$(pwd)
@@ -144,8 +145,12 @@ echo "------ Get basic Arch System"
 #debootstrap --no-check-gpg --arch=armhf --foreign wheezy $DEST/output/sdcard/
 
 #fetching latest Arch-Image for ARMv7 Allwinner Platform for the root filesystem
-wget -q -P $DEST/output/sdcard/ -O - http://archlinuxarm.org/os/ArchLinuxARM-sun7i-latest.tar.gz | tar -xzfp -
+#wget -q -P $DEST/output/sdcard/ -O - http://archlinuxarm.org/os/ArchLinuxARM-sun7i-latest.tar.gz | tar -xzf -
+cd $DEST/output/sdcard/
+wget -q http://archlinuxarm.org/os/ArchLinuxARM-sun7i-latest.tar.gz
 sync
+tar xvzf ArchLinuxARM-sun7i-latest.tar.gz
+#rm ArchLinuxARM-sun7i-latest.tar.gz
 # we need this
 #cp /usr/bin/qemu-arm-static $DEST/output/sdcard/usr/bin/
 # mount proc inside chroot
@@ -198,11 +203,12 @@ EOF
 #END
 
 # script to turn off the LED blinking
-mkdir $DEST/output/sdcard/etc/scripts
-cp $SRC/scripts/disable_led.sh $DEST/output/sdcard/etc/scripts/disable_led.sh
+#mkdir $DEST/output/sdcard/etc/scripts
+cp $SRC/scripts/disable_led.sh $DEST/output/sdcard/bin/disable_led.sh
 
 # make it executable
-chroot $DEST/output/sdcard /bin/bash -c "chmod +x /etc/scripts/disable_led.sh"
+#chroot $DEST/output/sdcard /bin/bash -c "chmod +x /etc/scripts/disable_led.sh"
+chmod +x $DEST/output/sdcard/bin/disable_led.sh
 # and startable on boot
 #if you want place an entry to /etc/rc.locale
 echo disable_led.sh > $DEST/output/sdcard/etc/rc.locale
@@ -210,20 +216,21 @@ echo disable_led.sh > $DEST/output/sdcard/etc/rc.locale
 
 # scripts for autoresize at first boot from cubian
 cd $DEST/output/sdcard/etc/scripts
-cp $SRC/scripts/cubian-resize2fs $DEST/output/sdcard/etc/scripts
-cp $SRC/scripts/cubian-firstrun $DEST/output/sdcard/etc/scripts
+cp $SRC/scripts/cubian-resize2fs $DEST/output/sdcard/bin/cubian-resize2fs
+cp $SRC/scripts/cubian-firstrun $DEST/output/sdcard/bin/cubian-firstrun
 
 # script to install to NAND
 #cp $SRC/scripts/nand-install.sh $DEST/output/sdcard/root
 #cp $SRC/bin/nand1-cubietruck-debian-boot.tgz $DEST/output/sdcard/root
 
 # make it executable
-chroot $DEST/output/sdcard /bin/bash -c "chmod +x /etc/scripts/cubian-*"
+#chroot $DEST/output/sdcard /bin/bash -c "chmod +x /etc/scripts/cubian-*"
+chmod +x $DEST/output/sdcard/bin/cubian-*
 # and startable on boot
 echo cubian-firstrun > $DEST/output/sdcard/etc/rc.locale
 #chroot $DEST/output/sdcard /bin/bash -c "update-rc.d cubian-firstrun defaults" 
 # install and configure locales for Germany
-echo LANG='$DEST_LANG'.UTF-8 > $DEST/output/sdcard/etc/default/.conf
+echo LANG='$DEST_LANG'.UTF-8 > $DEST/output/sdcard/etc/default.conf
 echo KEYMAP=de-latin1-nodeadkeys > $DEST/output/sdcard/etc/vconsole.conf
 ln -s /usr/share/zoneinfo/Europe/Berlin $DEST/output/sdcard/etc/localtime
 #chroot $DEST/output/sdcard /bin/bash -c "pacman -S locales"
@@ -236,11 +243,11 @@ ln -s /usr/share/zoneinfo/Europe/Berlin $DEST/output/sdcard/etc/localtime
 #chroot $DEST/output/sdcard /bin/bash -c "apt-get -qq -y upgrade"
 
 # configure MIN / MAX Speed for cpufrequtils
-sed -e 's/MIN_SPEED="0"/MIN_SPEED="480000"/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
-sed -e 's/MAX_SPEED="0"/MAX_SPEED="1010000"/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
+#sed -e 's/MIN_SPEED="0"/MIN_SPEED="480000"/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
+#sed -e 's/MAX_SPEED="0"/MAX_SPEED="1010000"/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
 #overclocked
 #sed -e 's/MAX_SPEED="0"/MAX_SPEED="1200000"/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
-sed -e 's/ondemand/interactive/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
+#sed -e 's/ondemand/interactive/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
 
 # i recommend you to change this urgently!!!
 # set password to 1234
@@ -250,12 +257,12 @@ chroot $DEST/output/sdcard /bin/bash -c "(echo 1234;echo 1234;) | passwd root"
 echo cubie > $DEST/output/sdcard/etc/hostname
 
 # load modules
-cat <<EOT >> $DEST/output/sdcard/etc/modules
-hci_uart
-gpio_sunxi
-bcmdhd
+#cat <<EOT >> $DEST/output/sdcard/etc/modules
+echo hci_uart > /etc/modules-load.d/cubieModules.conf
+echo gpio_sunxi > /etc/modules-load.d/cubieModules.conf
+echo bcmdhd > /etc/modules-load.d/cubieModules.conf
 #sunxi_gmac
-EOT
+#EOT
 
 # edit this for your personal needs/network configs
 # create interfaces configuration
@@ -265,9 +272,9 @@ allow-hotplug eth0
 iface eth0 inet dhcp
 #        hwaddress ether AE:50:30:27:5A:CF # change this
 #        pre-up /sbin/ifconfig eth0 mtu 3838 # setting MTU for DHCP, static just: mtu 3838
-#auto wlan0
-#allow-hotplug wlan0
-#iface wlan0 inet dhcp
+auto wlan0
+allow-hotplug wlan0
+iface wlan0 inet dhcp
 #    wpa-ssid SSID 
 #    wpa-psk xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 # to generate proper encrypted key: wpa_passphrase yourSSID yourpassword
@@ -290,7 +297,7 @@ EOT
 #EOT
 
 # enable serial console (Debian/sysvinit way)
-echo T0:2345:respawn:/sbin/getty -L ttyS0 115200 vt100 >> $DEST/output/sdcard/etc/inittab
+#echo T0:2345:respawn:/sbin/getty -L ttyS0 115200 vt100 >> $DEST/output/sdcard/etc/inittab
 
 #remove the preconfigured boot from the image and use the one we want
 rm -rf $DEST/output/sdcard/boot/
