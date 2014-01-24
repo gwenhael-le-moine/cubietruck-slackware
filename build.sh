@@ -116,8 +116,8 @@ make -j2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- INSTALL_HDR_PATH=output hea
 #--------------------------------------------------------------------------------
 echo "------ Creating SD Images"
 cd $DEST/output
-# create 1Gb image and mount image to next free loop device
-dd if=/dev/zero of=arch_rootfs.raw bs=1M count=1000
+# create 2Gb image and mount image to next free loop device
+dd if=/dev/zero of=arch_rootfs.raw bs=1M count=2000
 LOOP0=$(losetup -f)
 losetup $LOOP0 arch_rootfs.raw 
 
