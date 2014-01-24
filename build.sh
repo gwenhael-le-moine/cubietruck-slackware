@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # --- Configuration -------------------------------------------------------------
+#change to your needs
 VERSION="ArchLinux_0.1"
 DEST_LANG="de_DE"
 DEST_LANGUAGE="de"
@@ -18,7 +19,7 @@ fi
 echo "Building Cubietruck-Arch in $DEST from $SRC"
 sleep 3
 #--------------------------------------------------------------------------------
-# Downloading necessary files for building
+# Downloading necessary files for building - aka Toolchain
 #--------------------------------------------------------------------------------
 echo "------ Downloading necessary files"
 #Read this for further information if you run into problems with gcc compiler
@@ -138,14 +139,15 @@ mkfs.ext4 $LOOP1
 mkdir -p $DEST/output/sdcard/
 mount $LOOP1 $DEST/output/sdcard/
 
-echo "------ Install basic filesystem"
+echo "------ Get basic Arch System"
 # install base system
 #debootstrap --no-check-gpg --arch=armhf --foreign wheezy $DEST/output/sdcard/
+
 #fetching latest Arch-Image for ARMv7 Allwinner Platform for the root filesystem
-wget -q -P $DEST/output/sdcard/ -O - http://archlinuxarm.org/os/ArchLinuxARM-sun7i-latest.tar.gz | tar -xzf -
+wget -q -P $DEST/output/sdcard/ -O - http://archlinuxarm.org/os/ArchLinuxARM-sun7i-latest.tar.gz | tar -xzfp -
 sync
 # we need this
-cp /usr/bin/qemu-arm-static $DEST/output/sdcard/usr/bin/
+#cp /usr/bin/qemu-arm-static $DEST/output/sdcard/usr/bin/
 # mount proc inside chroot
 #mount -t proc chproc $DEST/output/sdcard/proc
 # second stage unmounts proc 
@@ -196,26 +198,30 @@ EOF
 #END
 
 # script to turn off the LED blinking
-cp $SRC/scripts/disable_led.sh $DEST/output/sdcard/etc/init.d/disable_led.sh
+mkdir $DEST/output/sdcard/etc/scripts
+cp $SRC/scripts/disable_led.sh $DEST/output/sdcard/etc/scripts/disable_led.sh
 
 # make it executable
-chroot $DEST/output/sdcard /bin/bash -c "chmod +x /etc/init.d/disable_led.sh"
+chroot $DEST/output/sdcard /bin/bash -c "chmod +x /etc/scripts/disable_led.sh"
 # and startable on boot
+#if you want place an entry to /etc/rc.locale
+echo disable_led.sh > $DEST/output/sdcard/etc/rc.locale
 #chroot $DEST/output/sdcard /bin/bash -c "update-rc.d disable_led.sh defaults" 
 
 # scripts for autoresize at first boot from cubian
-cd $DEST/output/sdcard/etc/init.d
-cp $SRC/scripts/cubian-resize2fs $DEST/output/sdcard/etc/init.d
-cp $SRC/scripts/cubian-firstrun $DEST/output/sdcard/etc/init.d
+cd $DEST/output/sdcard/etc/scripts
+cp $SRC/scripts/cubian-resize2fs $DEST/output/sdcard/etc/scripts
+cp $SRC/scripts/cubian-firstrun $DEST/output/sdcard/etc/scripts
 
 # script to install to NAND
 #cp $SRC/scripts/nand-install.sh $DEST/output/sdcard/root
 #cp $SRC/bin/nand1-cubietruck-debian-boot.tgz $DEST/output/sdcard/root
 
 # make it executable
-chroot $DEST/output/sdcard /bin/bash -c "chmod +x /etc/init.d/cubian-*"
+chroot $DEST/output/sdcard /bin/bash -c "chmod +x /etc/scripts/cubian-*"
 # and startable on boot
-chroot $DEST/output/sdcard /bin/bash -c "update-rc.d cubian-firstrun defaults" 
+echo cubian-firstrun > $DEST/output/sdcard/etc/rc.locale
+#chroot $DEST/output/sdcard /bin/bash -c "update-rc.d cubian-firstrun defaults" 
 # install and configure locales for Germany
 echo LANG='$DEST_LANG'.UTF-8 > $DEST/output/sdcard/etc/default/.conf
 echo KEYMAP=de-latin1-nodeadkeys > $DEST/output/sdcard/etc/vconsole.conf
