@@ -202,7 +202,6 @@ EOF
 #END
 
 # script to turn off the LED blinking
-#mkdir $DEST/output/sdcard/etc/scripts
 cp $SRC/scripts/disable_led.sh $DEST/output/sdcard/bin/disable_led.sh
 
 # make it executable
@@ -214,7 +213,6 @@ echo disable_led.sh > $DEST/output/sdcard/etc/rc.locale
 #chroot $DEST/output/sdcard /bin/bash -c "update-rc.d disable_led.sh defaults" 
 
 # scripts for autoresize at first boot from cubian
-cd $DEST/output/sdcard/etc/scripts
 cp $SRC/scripts/cubian-resize2fs $DEST/output/sdcard/bin/cubian-resize2fs
 cp $SRC/scripts/cubian-firstrun $DEST/output/sdcard/bin/cubian-firstrun
 
