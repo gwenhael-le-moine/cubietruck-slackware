@@ -150,7 +150,7 @@ cd $DEST/output/sdcard/
 wget -q http://archlinuxarm.org/os/ArchLinuxARM-sun7i-latest.tar.gz
 sync
 tar xvzf ArchLinuxARM-sun7i-latest.tar.gz
-#rm ArchLinuxARM-sun7i-latest.tar.gz
+rm ArchLinuxARM-sun7i-latest.tar.gz
 # we need this
 #cp /usr/bin/qemu-arm-static $DEST/output/sdcard/usr/bin/
 # mount proc inside chroot
@@ -167,8 +167,7 @@ tar xvzf ArchLinuxARM-sun7i-latest.tar.gz
 # update /etc/issue
 #cat <<EOT > $DEST/output/sdcard/etc/issue
 #Debian GNU/Linux 7 $VERSION
-
-EOT
+#EOT
 
 # update /etc/motd
 cat > $DEST/output/sdcard/etc/motd <<EOF
@@ -251,27 +250,30 @@ ln -s /usr/share/zoneinfo/Europe/Berlin $DEST/output/sdcard/etc/localtime
 
 # i recommend you to change this urgently!!!
 # set password to 1234
-chroot $DEST/output/sdcard /bin/bash -c "(echo 1234;echo 1234;) | passwd root" 
+#chroot $DEST/output/sdcard /bin/bash -c "(echo 1234;echo 1234;) | passwd root" 
 
 # set hostname 
 echo cubie > $DEST/output/sdcard/etc/hostname
 
 # load modules
-#cat <<EOT >> $DEST/output/sdcard/etc/modules
-echo hci_uart > /etc/modules-load.d/cubieModules.conf
-echo gpio_sunxi > /etc/modules-load.d/cubieModules.conf
-echo bcmdhd > /etc/modules-load.d/cubieModules.conf
+cat > $DEST/output/sdcard/etc/modules-load.d/cubieModules.conf
+cat <<EOT >> $DEST/output/sdcard/etc/modules-load.d/cubieModules.conf
+hci_uart
+gpio_sunxi
+bcmdhd
 #sunxi_gmac
-#EOT
+EOT
 
-# edit this for your personal needs/network configs
+# edit this to your personal needs/network configs
 # create interfaces configuration
-cat <<EOT >> $DEST/output/sdcard/etc/network/interfaces
+cat <<EOT >> $DEST/output/sdcard/etc/netctl/interfaces/eth0
 auto eth0
 allow-hotplug eth0
 iface eth0 inet dhcp
 #        hwaddress ether AE:50:30:27:5A:CF # change this
 #        pre-up /sbin/ifconfig eth0 mtu 3838 # setting MTU for DHCP, static just: mtu 3838
+EOT
+cat <<EOT >> $DEST/output/sdcard/etc/netctl/interfaces/wlan0
 auto wlan0
 allow-hotplug wlan0
 iface wlan0 inet dhcp
@@ -331,9 +333,9 @@ chmod +x $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd
 # copy to root
 cp $DEST/usb-redirector-linux-arm-eabi/files/usb* $DEST/output/sdcard/usr/local/bin/ 
 cp $DEST/usb-redirector-linux-arm-eabi/files/modules/src/tusbd/tusbd.ko $DEST/output/sdcard/usr/local/bin/ 
-cp $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd $DEST/output/sdcard/etc/init.d/
+cp $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd $DEST/output/sdcard/etc/modules-load.d/
 # started by default ----- update.rc rc.usbsrvd defaults
-chroot $DEST/output/sdcard /bin/bash -c "update-rc.d rc.usbsrvd defaults"
+#chroot $DEST/output/sdcard /bin/bash -c "update-rc.d rc.usbsrvd defaults"
 
 # hostapd from testing binary replace.
 cd $DEST/output/sdcard/usr/sbin/
