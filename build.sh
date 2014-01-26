@@ -353,12 +353,12 @@ cp nand-part $DEST/output/sdcard/usr/bin/
 
 # cleanup 
 # unmount proc, sys and dev from chroot
-umount $DEST/output/sdcard/dev/pts
-umount $DEST/output/sdcard/dev
-umount $DEST/output/sdcard/proc
-umount $DEST/output/sdcard/sys
+#umount $DEST/output/sdcard/dev/pts
+#umount $DEST/output/sdcard/dev
+#umount $DEST/output/sdcard/proc
+#umount $DEST/output/sdcard/sys
 
-rm $DEST/output/sdcard/usr/bin/qemu-arm-static 
+#rm $DEST/output/sdcard/usr/bin/qemu-arm-static 
 # umount images 
 umount $DEST/output/sdcard/ 
 losetup -d $LOOP1
