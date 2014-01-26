@@ -229,7 +229,9 @@ echo cubian-firstrun > $DEST/output/sdcard/etc/rc.locale
 # install and configure locales for Germany
 echo LANG='$DEST_LANG'.UTF-8 > $DEST/output/sdcard/etc/default.conf
 echo KEYMAP=de-latin1-nodeadkeys > $DEST/output/sdcard/etc/vconsole.conf
-ln -s /usr/share/zoneinfo/Europe/Berlin $DEST/output/sdcard/etc/localtime
+#use this command when System runs
+# timedatectl set-timezone Europe/Berlin
+#ln -s /usr/share/zoneinfo/Europe/Berlin $DEST/output/sdcard/etc/localtime
 #chroot $DEST/output/sdcard /bin/bash -c "pacman -S locales"
 # reconfigure locales
 #echo -e $DEST_LANG'.UTF-8 UTF-8\n' > $DEST/output/sdcard/etc/locale.gen 
@@ -239,7 +241,7 @@ ln -s /usr/share/zoneinfo/Europe/Berlin $DEST/output/sdcard/etc/localtime
 #chroot $DEST/output/sdcard /bin/bash -c "apt-get -qq -y install git hostapd dosfstools htop openssh-server ca-certificates module-init-tools dhcp3-client udev ifupdown iproute iputils-ping ntpdate ntp rsync usbutils uboot-envtools pciutils wireless-tools wpasupplicant procps libnl-dev parted cpufrequtils console-setup unzip bridge-utils" 
 #chroot $DEST/output/sdcard /bin/bash -c "apt-get -qq -y upgrade"
 
-# configure MIN / MAX Speed for cpufrequtils
+# configure MIN / MAX Speed for cpufrequtils change that with cpufrequ-set or with the /boot/config.fex
 #sed -e 's/MIN_SPEED="0"/MIN_SPEED="480000"/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
 #sed -e 's/MAX_SPEED="0"/MAX_SPEED="1010000"/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
 #overclocked
@@ -248,15 +250,13 @@ ln -s /usr/share/zoneinfo/Europe/Berlin $DEST/output/sdcard/etc/localtime
 
 # i recommend you to change this urgently!!!
 # set password to 1234
-#chroot $DEST/output/sdcard /bin/bash -c "(echo 1234;echo 1234;) | passwd root" 
+#echo 1234;echo 1234; | passwd root
 
 # set hostname 
 echo cubie > $DEST/output/sdcard/etc/hostname
 
-# load modules
-cat > $DEST/output/sdcard/etc/modules-load.d/cubieModules.conf
-
-cat <<EOT >> $DEST/output/sdcard/etc/modules-load.d/cubieModules.conf
+# load modules you may load them per sysctl
+cat > $DEST/output/sdcard/etc/modules-load.d/cubieModules.conf <<EOT >
 hci_uart
 gpio_sunxi
 bcmdhd
@@ -264,9 +264,9 @@ bcmdhd
 
 EOT
 
-# edit this to your personal needs/network configs
+# edit this to your personal needs/network configs take the ones from /etc/netctl/examples/ folder
 # create interfaces configuration
-cat <<EOT >> $DEST/output/sdcard/etc/netctl/interfaces/eth0
+cat > $DEST/output/sdcard/etc/netctl/interfaces/eth0 <<EOT >
 auto eth0
 allow-hotplug eth0
 iface eth0 inet dhcp
@@ -275,7 +275,7 @@ iface eth0 inet dhcp
 
 EOT
 
-cat <<EOT >> $DEST/output/sdcard/etc/netctl/interfaces/wlan0
+cat > $DEST/output/sdcard/etc/netctl/interfaces/wlan0 <<EOT >
 auto wlan0
 allow-hotplug wlan0
 iface wlan0 inet dhcp
