@@ -256,7 +256,7 @@ echo KEYMAP=de-latin1-nodeadkeys > $DEST/output/sdcard/etc/vconsole.conf
 echo cubie > $DEST/output/sdcard/etc/hostname
 
 # load modules you may load them per sysctl
-cat > $DEST/output/sdcard/etc/modules-load.d/cubieModules.conf <<EOT >
+cat > $DEST/output/sdcard/etc/modules-load.d/cubieModules.conf <<EOT
 hci_uart
 gpio_sunxi
 bcmdhd
@@ -266,7 +266,7 @@ EOT
 
 # edit this to your personal needs/network configs take the ones from /etc/netctl/examples/ folder
 # create interfaces configuration
-cat > $DEST/output/sdcard/etc/netctl/interfaces/eth0 <<EOT >
+cat > $DEST/output/sdcard/etc/netctl/interfaces/eth0 <<EOT
 auto eth0
 allow-hotplug eth0
 iface eth0 inet dhcp
@@ -275,7 +275,7 @@ iface eth0 inet dhcp
 
 EOT
 
-cat > $DEST/output/sdcard/etc/netctl/interfaces/wlan0 <<EOT >
+cat > $DEST/output/sdcard/etc/netctl/interfaces/wlan0 <<EOT
 auto wlan0
 allow-hotplug wlan0
 iface wlan0 inet dhcp
