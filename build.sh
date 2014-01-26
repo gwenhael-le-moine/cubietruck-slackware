@@ -248,8 +248,8 @@ echo KEYMAP=de-latin1-nodeadkeys > $DEST/output/sdcard/etc/vconsole.conf
 #sed -e 's/MAX_SPEED="0"/MAX_SPEED="1200000"/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
 #sed -e 's/ondemand/interactive/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
 
-# i recommend you to change this urgently!!!
-# set password to 1234
+# i recommend you to change this urgently + add a proper user for the System!!!
+# default passwort for user "root" is "root" 
 #echo 1234;echo 1234; | passwd root
 
 # set hostname 
