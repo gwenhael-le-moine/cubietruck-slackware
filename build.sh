@@ -148,8 +148,8 @@ echo "------ Get basic Arch System"
 #wget -q -P $DEST/output/sdcard/ -O - http://archlinuxarm.org/os/ArchLinuxARM-sun7i-latest.tar.gz | tar -xzf -
 cd $DEST/output/sdcard/
 wget -q http://archlinuxarm.org/os/ArchLinuxARM-sun7i-latest.tar.gz
-sync
 tar xvzf ArchLinuxARM-sun7i-latest.tar.gz
+sync
 rm ArchLinuxARM-sun7i-latest.tar.gz
 # we need this
 #cp /usr/bin/qemu-arm-static $DEST/output/sdcard/usr/bin/
