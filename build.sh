@@ -56,15 +56,11 @@ if [ -d "$DEST/linux-sunxi" ]
 then
 	cd $DEST/linux-sunxi; git pull -f; cd $SRC
 else
-	# git clone https://github.com/cubieboard/linux-sunxi/ $DEST/linux-sunxi # Kernel 3.4.61+
 	git clone https://github.com/patrickhwood/linux-sunxi -b pat-3.4.75-ct $DEST/linux-sunxi # Patwood's kernel 3.4.75+
 fi
 
 # Applying Patch for 2gb memory
-#patch -f $DEST/u-boot-sunxi/include/configs/sunxi-common.h < $SRC/patch/memory.patch || true
-
-# Applying Patch for gpio
-#patch -f $DEST/linux-sunxi/drivers/gpio/gpio-sunxi.c < $SRC/patch/gpio.patch || true
+patch -f $DEST/u-boot-sunxi/include/configs/sunxi-common.h < $SRC/patch/memory.patch || true
 
 # Applying Patch for high load. Could cause troubles with USB OTG port
 sed -e 's/usb_detect_type     = 1/usb_detect_type     = 0/g' $DEST/cubie_configs/sysconfig/linux/cubietruck.fex > $DEST/cubie_configs/sysconfig/linux/ct.fex
@@ -73,14 +69,12 @@ sed -e 's/usb_detect_type     = 1/usb_detect_type     = 0/g' $DEST/cubie_configs
 sed -e 's/screen0_output_type.*/screen0_output_type     = 3/g' $DEST/cubie_configs/sysconfig/linux/ct.fex > $DEST/cubie_configs/sysconfig/linux/ct-hdmi.fex
 sed -e 's/screen0_output_type.*/screen0_output_type     = 4/g' $DEST/cubie_configs/sysconfig/linux/ct.fex > $DEST/cubie_configs/sysconfig/linux/ct-vga.fex
 
-
 # Copying Kernel config
 cp $SRC/config/kernel.config $DEST/linux-sunxi/
 
 #--------------------------------------------------------------------------------
 # Compiling everything
 #--------------------------------------------------------------------------------
-#if false; then
 echo "------ Compiling kernel boot loaderb"
 cd $DEST/u-boot-sunxi
 # boot loader
@@ -110,7 +104,6 @@ cp $DEST/linux-sunxi/kernel.config $DEST/linux-sunxi/.config
 make -j2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- uImage modules
 make -j2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- INSTALL_MOD_PATH=output modules_install
 make -j2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- INSTALL_HDR_PATH=output headers_install
-#fi
 
 #--------------------------------------------------------------------------------
 # Creating SD Images
@@ -141,35 +134,15 @@ mkdir -p $DEST/output/sdcard/
 mount $LOOP1 $DEST/output/sdcard/
 
 echo "------ Get basic Arch System"
-# install base system
-#debootstrap --no-check-gpg --arch=armhf --foreign wheezy $DEST/output/sdcard/
-
-#fetching latest Arch-Image for ARMv7 Allwinner Platform for the root filesystem
 #wget -q -P $DEST/output/sdcard/ -O - http://archlinuxarm.org/os/ArchLinuxARM-sun7i-latest.tar.gz | tar -xzf -
 cd $DEST/output/sdcard/
 wget -q http://archlinuxarm.org/os/ArchLinuxARM-sun7i-latest.tar.gz
 tar xvzf ArchLinuxARM-sun7i-latest.tar.gz
 sync
 rm ArchLinuxARM-sun7i-latest.tar.gz
-# we need this
+# we need this donno why???
 #cp /usr/bin/qemu-arm-static $DEST/output/sdcard/usr/bin/
-# mount proc inside chroot
-#mount -t proc chproc $DEST/output/sdcard/proc
-# second stage unmounts proc 
-#chroot $DEST/output/sdcard /bin/bash -c "/debootstrap/debootstrap --second-stage"
-# mount proc, sys and dev
-#mount -t proc chproc $DEST/output/sdcard/proc
-#mount -t sysfs chsys $DEST/output/sdcard/sys
-# This works on half the systems I tried.  Else use bind option
-#mount -t devtmpfs chdev $DEST/output/sdcard/dev || mount --bind /dev $DEST/output/sdcard/dev
-#mount -t devpts chpts $DEST/output/sdcard/dev/pts
 
-# update /etc/issue
-#cat <<EOT > $DEST/output/sdcard/etc/issue
-#Debian GNU/Linux 7 $VERSION
-#EOT
-
-# update /etc/motd
 cat > $DEST/output/sdcard/etc/motd <<EOF
               _      _        _                       _    
   ___  _   _ | |__  (_)  ___ | |_  _ __  _   _   ___ | | __
@@ -180,73 +153,31 @@ cat > $DEST/output/sdcard/etc/motd <<EOF
 
 EOF
 
-
-# apt list
-#cat <<EOT > $DEST/output/sdcard/etc/apt/sources.list
-#deb http://http.debian.net/debian wheezy main contrib non-free
-#deb-src http://http.debian.net/debian wheezy main contrib non-free
-#deb http://http.debian.net/debian wheezy-updates main contrib non-free
-#deb-src http://http.debian.net/debian wheezy-updates main contrib non-free
-#deb http://security.debian.org/debian-security wheezy/updates main contrib non-free
-#deb-src http://security.debian.org/debian-security wheezy/updates main contrib non-free
-#EOT
-
-# update
-#chroot $DEST/output/sdcard /bin/bash -c "apt-get update"
-#chroot $DEST/output/sdcard /bin/bash -c "export LANG=C"    
-
-# set up 'apt
-#cat <<END > $DEST/output/sdcard/etc/apt/apt.conf.d/71-no-recommends
-#APT::Install-Recommends "0";
-#APT::Install-Suggests "0";
-#END
-
 # script to turn off the LED blinking
 cp $SRC/scripts/disable_led.sh $DEST/output/sdcard/bin/disable_led.sh
 
 # make it executable
-#chroot $DEST/output/sdcard /bin/bash -c "chmod +x /etc/scripts/disable_led.sh"
 chmod +x $DEST/output/sdcard/bin/disable_led.sh
 # and startable on boot
-#if you want place an entry to /etc/rc.locale
-echo disable_led.sh > $DEST/output/sdcard/etc/rc.locale
-#chroot $DEST/output/sdcard /bin/bash -c "update-rc.d disable_led.sh defaults" 
+echo disable_led.sh > $DEST/output/sdcard/etc/rc.conf
 
 # scripts for autoresize at first boot from cubian
-cp $SRC/scripts/cubian-resize2fs $DEST/output/sdcard/bin/cubian-resize2fs
-cp $SRC/scripts/cubian-firstrun $DEST/output/sdcard/bin/cubian-firstrun
+cp $SRC/scripts/cubian-resize2fs $DEST/output/sdcard/cubian-resize2fs
+# make it executable
+chmod +x $DEST/output/sdcard/cubian-resize2fs
+# and startable on boot just execute it once not on every boot!!!
+#echo cubian-resize2fs > $DEST/output/sdcard/etc/rc.conf
 
 # script to install to NAND
-#cp $SRC/scripts/nand-install.sh $DEST/output/sdcard/root
-#cp $SRC/bin/nand1-cubietruck-debian-boot.tgz $DEST/output/sdcard/root
+cp $SRC/scripts/nand-install.sh $DEST/output/sdcard/root
+cp $SRC/bin/nand1-cubietruck-debian-boot.tgz $DEST/output/sdcard/root
 
-# make it executable
-#chroot $DEST/output/sdcard /bin/bash -c "chmod +x /etc/scripts/cubian-*"
-chmod +x $DEST/output/sdcard/bin/cubian-*
-# and startable on boot
-echo cubian-firstrun > $DEST/output/sdcard/etc/rc.locale
-#chroot $DEST/output/sdcard /bin/bash -c "update-rc.d cubian-firstrun defaults" 
 # install and configure locales for Germany
 echo LANG='$DEST_LANG'.UTF-8 > $DEST/output/sdcard/etc/default.conf
 echo KEYMAP=de-latin1-nodeadkeys > $DEST/output/sdcard/etc/vconsole.conf
 #use this command when System runs
-# timedatectl set-timezone Europe/Berlin
-#ln -s /usr/share/zoneinfo/Europe/Berlin $DEST/output/sdcard/etc/localtime
-#chroot $DEST/output/sdcard /bin/bash -c "pacman -S locales"
-# reconfigure locales
-#echo -e $DEST_LANG'.UTF-8 UTF-8\n' > $DEST/output/sdcard/etc/locale.gen 
-#chroot $DEST/output/sdcard /bin/bash -c "locale-gen"
-#echo -e 'LANG="'$DEST_LANG'.UTF-8"\nLANGUAGE="'$DEST_LANG':'$DEST_LANGUAGE'"\n' > $DEST/output/sdcard/etc/default/locale
-#chroot $DEST/output/sdcard /bin/bash -c "export LANG=$DEST_LANG.UTF-8"
-#chroot $DEST/output/sdcard /bin/bash -c "apt-get -qq -y install git hostapd dosfstools htop openssh-server ca-certificates module-init-tools dhcp3-client udev ifupdown iproute iputils-ping ntpdate ntp rsync usbutils uboot-envtools pciutils wireless-tools wpasupplicant procps libnl-dev parted cpufrequtils console-setup unzip bridge-utils" 
-#chroot $DEST/output/sdcard /bin/bash -c "apt-get -qq -y upgrade"
-
-# configure MIN / MAX Speed for cpufrequtils change that with cpufrequ-set or with the /boot/config.fex
-#sed -e 's/MIN_SPEED="0"/MIN_SPEED="480000"/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
-#sed -e 's/MAX_SPEED="0"/MAX_SPEED="1010000"/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
-#overclocked
-#sed -e 's/MAX_SPEED="0"/MAX_SPEED="1200000"/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
-#sed -e 's/ondemand/interactive/g' -i $DEST/output/sdcard/etc/init.d/cpufrequtils
+# sudo timedatectl set-timezone Zone/SubZone
+# when setup preferred gui like openbox then use loadkeys de
 
 # i recommend you to change this urgently + add a proper user for the System!!!
 # default passwort for user "root" is "root" 
@@ -266,16 +197,16 @@ EOT
 
 # edit this to your personal needs/network configs take the ones from /etc/netctl/examples/ folder
 # create interfaces configuration
-cat > $DEST/output/sdcard/etc/netctl/interfaces/eth0 <<EOT
-auto eth0
-allow-hotplug eth0
-iface eth0 inet dhcp
-#        hwaddress ether AE:50:30:27:5A:CF # change this
-#        pre-up /sbin/ifconfig eth0 mtu 3838 # setting MTU for DHCP, static just: mtu 3838
+#cat > $DEST/output/sdcard/etc/netctl/interfaces/eth0 <<EOT
+#auto eth0
+#allow-hotplug eth0
+#iface eth0 inet dhcp
+#        hwaddress ether #for AP use
+#
+#EOT
 
-EOT
-
-cat > $DEST/output/sdcard/etc/netctl/interfaces/wlan0 <<EOT
+#use wifi-menu wlan0 to configure
+cat > $DEST/output/sdcard/etc/netctl/wlan0 <<EOT
 auto wlan0
 allow-hotplug wlan0
 iface wlan0 inet dhcp
@@ -298,6 +229,7 @@ EOT
 
 #iface br0 inet dhcp
 #bridge_ports eth0 wlan0
+#hwaddress ether # will be added at first boot
 #EOT
 
 # enable serial console (Debian/sysvinit way)
@@ -336,8 +268,7 @@ chmod +x $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd
 cp $DEST/usb-redirector-linux-arm-eabi/files/usb* $DEST/output/sdcard/usr/local/bin/ 
 cp $DEST/usb-redirector-linux-arm-eabi/files/modules/src/tusbd/tusbd.ko $DEST/output/sdcard/usr/local/bin/ 
 cp $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd $DEST/output/sdcard/etc/modules-load.d/
-# started by default ----- update.rc rc.usbsrvd defaults
-#chroot $DEST/output/sdcard /bin/bash -c "update-rc.d rc.usbsrvd defaults"
+# started by default
 
 # hostapd from testing binary replace.
 cd $DEST/output/sdcard/usr/sbin/
@@ -351,14 +282,6 @@ cp fex2bin $DEST/output/sdcard/usr/bin/
 cp bin2fex $DEST/output/sdcard/usr/bin/
 cp nand-part $DEST/output/sdcard/usr/bin/
 
-# cleanup 
-# unmount proc, sys and dev from chroot
-#umount $DEST/output/sdcard/dev/pts
-#umount $DEST/output/sdcard/dev
-#umount $DEST/output/sdcard/proc
-#umount $DEST/output/sdcard/sys
-
-#rm $DEST/output/sdcard/usr/bin/qemu-arm-static 
 # umount images 
 umount $DEST/output/sdcard/ 
 losetup -d $LOOP1
