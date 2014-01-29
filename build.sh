@@ -186,6 +186,9 @@ echo KEYMAP=de-latin1-nodeadkeys > $DEST/output/sdcard/etc/vconsole.conf
 # set hostname 
 echo cubie > $DEST/output/sdcard/etc/hostname
 
+# not update the firmware!!
+echo IgnorePkg=linux-sun7i > $DEST/output/sdcard/etc/pacman.conf
+
 # load modules you may load them per sysctl
 cat > $DEST/output/sdcard/etc/modules-load.d/cubieModules.conf <<EOT
 hci_uart
