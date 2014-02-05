@@ -209,15 +209,15 @@ EOT
 #EOT
 
 #use wifi-menu wlan0 to configure
-cat > $DEST/output/sdcard/etc/netctl/wlan0 <<EOT
-auto wlan0
-allow-hotplug wlan0
-iface wlan0 inet dhcp
+#cat > $DEST/output/sdcard/etc/netctl/wlan0 <<EOT
+#auto wlan0
+#allow-hotplug wlan0
+#iface wlan0 inet dhcp
 #    wpa-ssid SSID 
 #    wpa-psk xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 # to generate proper encrypted key: wpa_passphrase yourSSID yourpassword
 
-EOT
+#EOT
 
 # create interfaces if you want to have AP. /etc/modules must be: bcmdhd op_mode=2
 #cat <<EOT >> $DEST/output/sdcard/etc/network/interfaces.hostapd
@@ -255,22 +255,22 @@ cp -R $DEST/linux-sunxi/output/lib/modules $DEST/output/sdcard/lib/
 cp -R $DEST/linux-sunxi/output/lib/firmware/ $DEST/output/sdcard/lib/
 
 # USB redirector tools http://www.incentivespro.com
-cd $DEST
-wget http://www.incentivespro.com/usb-redirector-linux-arm-eabi.tar.gz
-tar xvfz usb-redirector-linux-arm-eabi.tar.gz
-rm usb-redirector-linux-arm-eabi.tar.gz
-cd $DEST/usb-redirector-linux-arm-eabi/files/modules/src/tusbd
-make -j2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- KERNELDIR=$DEST/linux-sunxi/
+#cd $DEST
+#wget http://www.incentivespro.com/usb-redirector-linux-arm-eabi.tar.gz
+#tar xvfz usb-redirector-linux-arm-eabi.tar.gz
+#rm usb-redirector-linux-arm-eabi.tar.gz
+#cd $DEST/usb-redirector-linux-arm-eabi/files/modules/src/tusbd
+#make -j2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- KERNELDIR=$DEST/linux-sunxi/
 # configure USB redirector
-sed -e 's/%INSTALLDIR_TAG%/\/usr\/local/g' $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd > $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd1
-sed -e 's/%PIDFILE_TAG%/\/var\/run\/usbsrvd.pid/g' $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd1 > $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd
-sed -e 's/%STUBNAME_TAG%/tusbd/g' $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd > $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd1
-sed -e 's/%DAEMONNAME_TAG%/usbsrvd/g' $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd1 > $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd
-chmod +x $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd
+#sed -e 's/%INSTALLDIR_TAG%/\/usr\/local/g' $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd > $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd1
+#sed -e 's/%PIDFILE_TAG%/\/var\/run\/usbsrvd.pid/g' $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd1 > $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd
+#sed -e 's/%STUBNAME_TAG%/tusbd/g' $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd > $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd1
+#sed -e 's/%DAEMONNAME_TAG%/usbsrvd/g' $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd1 > $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd
+#chmod +x $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd
 # copy to root
-cp $DEST/usb-redirector-linux-arm-eabi/files/usb* $DEST/output/sdcard/usr/local/bin/ 
-cp $DEST/usb-redirector-linux-arm-eabi/files/modules/src/tusbd/tusbd.ko $DEST/output/sdcard/usr/local/bin/ 
-cp $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd $DEST/output/sdcard/etc/modules-load.d/
+#cp $DEST/usb-redirector-linux-arm-eabi/files/usb* $DEST/output/sdcard/usr/local/bin/ 
+#cp $DEST/usb-redirector-linux-arm-eabi/files/modules/src/tusbd/tusbd.ko $DEST/output/sdcard/usr/local/bin/ 
+#cp $DEST/usb-redirector-linux-arm-eabi/files/rc.usbsrvd $DEST/output/sdcard/etc/modules-load.d/
 # started by default
 
 # hostapd from testing binary replace.
