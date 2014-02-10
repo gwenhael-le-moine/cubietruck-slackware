@@ -5,6 +5,7 @@
 VERSION="ArchLinux_0.1"
 DEST_LANG="de_DE"
 DEST_LANGUAGE="de"
+COMPILE="true"
 mkdir ~/cubie
 DEST=~/cubie
 DISPLAY=3  # "3:hdmi; 4:vga"
@@ -106,6 +107,7 @@ cp fex2bin bin2fex /usr/local/bin/
 fex2bin $DEST/cubie_configs/sysconfig/linux/ct-vga.fex $DEST/output/script-vga.bin
 fex2bin $DEST/cubie_configs/sysconfig/linux/ct-hdmi.fex $DEST/output/script-hdmi.bin
 
+if ["$COMPILE" = "true"]; then
 # kernel image
 echo "------ Compiling kernel"
 cd $DEST/linux-sunxi
@@ -122,7 +124,7 @@ cp $DEST/linux-sunxi/kernel.config $DEST/linux-sunxi/.config
 make -j2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- uImage modules
 make -j2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- INSTALL_MOD_PATH=output modules_install
 make -j2 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- INSTALL_HDR_PATH=output headers_install
-
+fi
 #--------------------------------------------------------------------------------
 # Creating SD Images
 #--------------------------------------------------------------------------------
