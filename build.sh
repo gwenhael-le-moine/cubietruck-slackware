@@ -157,7 +157,7 @@ echo "------ Get basic Arch System"
 #wget -q -P $DEST/output/sdcard/ -O - http://archlinuxarm.org/os/ArchLinuxARM-sun7i-latest.tar.gz | tar -xzf -
 cd $DEST/output/sdcard/
 wget -q http://archlinuxarm.org/os/ArchLinuxARM-sun7i-latest.tar.gz
-tar xvzf ArchLinuxARM-sun7i-latest.tar.gz
+tar xzf ArchLinuxARM-sun7i-latest.tar.gz
 sync
 rm ArchLinuxARM-sun7i-latest.tar.gz
 # we need this donno why???
@@ -190,7 +190,7 @@ chmod +x $DEST/output/sdcard/cubian-resize2fs
 
 # script to install to NAND
 cp $SRC/scripts/nand-install.sh $DEST/output/sdcard/root
-cp $SRC/bin/nand1-cubietruck-debian-boot.tgz $DEST/output/sdcard/root
+cp $SRC/bin/nand1-boot-cubietruck-arch.tgz $DEST/output/sdcard/root
 
 # install and configure locales for Germany
 echo LANG='$DEST_LANG'.UTF-8 > $DEST/output/sdcard/etc/default.conf
@@ -208,6 +208,22 @@ echo cubie > $DEST/output/sdcard/etc/hostname
 
 # not update the firmware!!
 sed -i 's/#IgnorePkg   =/IgnorePkg   = linux-sun7i/g' $DEST/output/sdcard/etc/pacman.conf
+
+
+### mount /tmp as tmpfs
+echo 'tmpfs /tmp  tmpfs   defaults,nosuid,size=30%   0   0' >> $DEST/output/sdcard/etc/fstab
+
+### Optional /var/log
+#echo 'tmpfs /var/log  tmpfs   defaults,nosuid   0   0' >> $DEST/output/sdcard/etc/fstab
+
+##disable IPV6 and reduce timeout from 30s to 5 on dhcp daemon
+
+#echo "ipv4only" >> /etc/dhcpcd.conf
+#echo "noipv6rs" >> /etc/dhcpcd.conf
+echo "timeout 5" >> /etc/dhcpcd.conf
+
+
+
 
 # load modules you may load them per sysctl
 cat > $DEST/output/sdcard/etc/modules-load.d/cubieModules.conf <<EOT
