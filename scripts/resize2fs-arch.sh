@@ -11,12 +11,18 @@
 #
 #####################################################################################
 
-REVISION=1.0
-DATE=02132014 
+REVISION=2.0
+DATE=02152014 
 
 
-DISKID=mmcblk0
+DISCID=mmcblk0
 PARTID=mmcblk0p1
+
+
+
+test -b /dev/$DISCID || { echo "SD device /dev/$DISCID can not be identifed. Please verify." ; exit 1 ;  } ;
+
+
 
 resizepartition() {
 echo "******Resizing partition******************************"
@@ -24,27 +30,15 @@ echo
 
 sync
 
-##### fdisk commands
-#p      print (check if first sector @2048 !! very important, if not all data ar elost if you continue !!!)
-#d      delete partition (just the table!)
-#n      new partition
-#p      primary partition
-#1      partition number
-#<ret>  confirm default first sector @ 2048
-#<ret>  confirm default last sector @ max
-#p      print to verify new setup
-#w      write to disk
-#####
-
-FIRSTSECTOR="$(( echo p) | fdisk /dev/$DISKID | grep $PARTID | sed "s/\*//g" | tr -s " " | cut -f 2 -d " " )"
-( echo d; echo n; echo p; echo 1; echo $FIRSTSECTOR; echo; echo w; ) | fdisk /dev/$DISKID
+FIRSTSECTOR="$(( echo p) | fdisk "/dev/$DISCID" | grep $PARTID | sed "s/\*//g" | tr -s " " | cut -f 2 -d " " )"
+#echo $FIRSTSECTOR
+( echo d; echo n; echo p; echo 1; echo $FIRSTSECTOR; echo; echo w; ) | fdisk /dev/$DISCID
 shutdown -r now    
 }
 
 resizefs() {
 echo "******Resizing filesystem******************************"
 echo
-
 resize2fs -p /dev/$PARTID
 }
 
@@ -52,9 +46,8 @@ resize2fs -p /dev/$PARTID
 help() {
 echo "
 ###############################################
-Resizing Tool for Partion and Filesystem 
-Applicable to ArchLinux on Cubietruck.
-
+FS partitioning and resizing tool  
+for SD card
 Revision $REVISION
 
 Warning: 
@@ -75,9 +68,9 @@ Options:
 
 case $1 in 
 
-   p) resizepartition
+   -p) resizepartition
       ;;
-   f) resizefs
+   -f) resizefs
       ;;
    *) help
       ;;
