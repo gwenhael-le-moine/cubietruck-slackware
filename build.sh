@@ -88,6 +88,14 @@ sed -e 's/usb_detect_type     = 1/usb_detect_type     = 0/g' $DEST/cubie_configs
 sed -e 's/screen0_output_type.*/screen0_output_type     = 3/g' $DEST/cubie_configs/sysconfig/linux/ct.fex > $DEST/cubie_configs/sysconfig/linux/ct-hdmi.fex
 sed -e 's/screen0_output_type.*/screen0_output_type     = 4/g' $DEST/cubie_configs/sysconfig/linux/ct.fex > $DEST/cubie_configs/sysconfig/linux/ct-vga.fex
 
+
+###PATCH kernel CONFIG_HZ, Arm dfault is hardcoded 100hz (10ms latency!). For mulitimedia and desktop a higher frequency is recomended.
+
+#test -f $SRC/patch/250HZ.patch && patch -f $DEST/linux-sunxi/arch/arm/Kconfig < $SRC/patch/250HZ.patch
+test -f $SRC/patch/300HZ.patch && patch -f $DEST/linux-sunxi/arch/arm/Kconfig < $SRC/patch/300HZ.patch
+#test -f $SRC/patch/1000HZ.patch && patch -f $DEST/linux-sunxi/arch/arm/Kconfig < $SRC/patch/1000HZ.patch
+
+
 # Copying Kernel config
 cp $SRC/config/kernel.config $DEST/linux-sunxi/
 
