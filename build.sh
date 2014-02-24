@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# --- TODO
+# * remove dependance on debian based host
+# * switch userland to hard-float binaries
+
 # --- Configuration -------------------------------------------------------------
 #change to your needs
 VERSION="SlackwareARM_0.1"
@@ -10,6 +14,7 @@ mkdir ~/cubieslack
 DEST=~/cubieslack
 DISPLAY=3  # "3:hdmi; 4:vga"
 # --- End -----------------------------------------------------------------------
+
 SRC=$(pwd)
 set -e
 
