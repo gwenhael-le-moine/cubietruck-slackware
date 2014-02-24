@@ -24,6 +24,10 @@ Installation steps Slackware for Cubietruck
 
 7. sudo ./build.sh
 
-8-99. dd if=/where/is/it/ of=/dev/mmcblk0 bs=4096 (FIXME)
+8. cd ../cubieslack
+
+9. gunzip slackware_rootfs.raw.gz
+
+10. dd if=slackware_rootfs.raw of=/dev/mmcblk0 bs=1024
 
 99. Enjoy Slackware :)
