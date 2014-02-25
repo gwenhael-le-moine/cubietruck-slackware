@@ -3,6 +3,9 @@
 # --- TODO
 # * remove dependance on debian based host
 # * switch userland to hard-float binaries
+# * build rootfs from slackwarearm-current
+#    ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/scripts/
+# * package the kernel in a real slackware package
 
 # --- Configuration -------------------------------------------------------------
 #change to your needs
