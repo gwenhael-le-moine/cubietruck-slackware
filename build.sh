@@ -2,6 +2,8 @@
 
 # --- TODO
 # * remove dependance on debian based host
+# ** use linaro toolchain
+#     https://launchpad.net/linaro-toolchain-binaries/trunk/
 # * clean up script
 # * switch userland to hard-float binaries
 # * build rootfs from slackwarearm-current
