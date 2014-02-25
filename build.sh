@@ -2,6 +2,7 @@
 
 # --- TODO
 # * remove dependance on debian based host
+# * clean up script
 # * switch userland to hard-float binaries
 # * build rootfs from slackwarearm-current
 #    ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/scripts/
