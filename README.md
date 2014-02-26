@@ -12,7 +12,7 @@ Installation steps Slackware for Cubietruck
 
 1. open your preferred shell
 
-2. sudo apt-get -y install git
+2. su -
 
 3. cd ~
 
@@ -24,10 +24,10 @@ Installation steps Slackware for Cubietruck
 
 7. sudo ./build.sh
 
-8. cd ../cubieslack
+8. cd ~/cubieslack/output
 
-9. gunzip slackware_rootfs.raw.gz
+9. gunzip <image>.raw.gz
 
-10. dd if=slackware_rootfs.raw of=/dev/mmcblk0 bs=1024
+10. dd if=<image>.raw of=/dev/mmcblk0 bs=1024
 
 99. Enjoy Slackware :)
