@@ -155,13 +155,18 @@ cp $SRC/config/kernel.config $DEST/linux-sunxi/
 
 echo "------ Compiling boot loader"
 cd $DEST/u-boot-sunxi
-make clean && make -j2 'cubietruck' CROSS_COMPILE=$CROSS_COMPILE
+make clean
+make -j2 'cubietruck' CROSS_COMPILE=$CROSS_COMPILE
 
 echo "------ Compiling sunxi tools"
 cd $DEST/sunxi-tools
-make clean && make fex2bin && make bin2fex
+make clean
+make fex2bin
+make bin2fex
+
 mkdir -p $CWD/bin/
 cp fex2bin bin2fex $CWD/bin/
+
 # hardware configuration
 $CWD/bin/fex2bin $DEST/cubie_configs/sysconfig/linux/ct-vga.fex $DEST/output/script-vga.bin
 $CWD/bin/fex2bin $DEST/cubie_configs/sysconfig/linux/ct-hdmi.fex $DEST/output/script-hdmi.bin
