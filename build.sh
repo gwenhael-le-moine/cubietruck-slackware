@@ -264,14 +264,10 @@ cp -R $DEST/linux-sunxi/output/lib/firmware/ $DEST/output/sdcard/lib/
 # sunxi-tools
 cd $DEST/sunxi-tools
 make clean
-make -j2 'fex2bin' CC=${CROSS_COMPILE}gcc
-make -j2 'bin2fex' CC=${CROSS_COMPILE}gcc
-make -j2 'nand-part' CC=${CROSS_COMPILE}gcc
+make -j2 'fex2bin' 'bin2fex' 'nand-part' CC=${CROSS_COMPILE}gcc
 
 mkdir -p $DEST/output/sdcard/usr/bin/
-cp fex2bin $DEST/output/sdcard/usr/bin/
-cp bin2fex $DEST/output/sdcard/usr/bin/
-cp nand-part $DEST/output/sdcard/usr/bin/
+cp fex2bin bin2fex nand-part $DEST/output/sdcard/usr/bin/
 
 # umount images
 umount $DEST/output/sdcard/
