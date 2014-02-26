@@ -1,1 +1,4 @@
 output
+/gcc-linaro-arm-linux-gnueabihf-*
+/bin/bin2fex
+/bin/fex2bin
