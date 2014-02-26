@@ -9,6 +9,9 @@
 # * TODO switch userland to hard-float binaries
 # * TODO build rootfs from slackwarearm-current
 #    ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/scripts/
+# * TODO compile mkimage as part of the build process?
+# * TODO organize patches by corresponding sources
+# * TODO review $CWD/scripts/resize2fs-arch.sh
 
 if [ ! -x /usr/bin/mkimage ]; then
     echo "Missing u-boot tools"
