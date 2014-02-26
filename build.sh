@@ -66,7 +66,7 @@ sleep 3
 #--------------------------------------------------------------------------------
 # Downloading necessary files for building - aka Toolchain
 #--------------------------------------------------------------------------------
-echo "------ Downloading necessary files"
+echo "------ Downloading cross-compiler"
 #Read this for further information if you run into problems with gcc compiler
 #http://linux-sunxi.org/Toolchain
 
