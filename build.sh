@@ -9,18 +9,12 @@
 # * TODO switch userland to hard-float binaries
 # * TODO build rootfs from slackwarearm-current
 #    ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/scripts/
-# * TODO compile mkimage as part of the build process?
+# * DONE compile mkimage as part of the build process?
 # * TODO organize patches by corresponding sources
 # * TODO review $CWD/scripts/resize2fs-arch.sh
+# * TODO compile out-of-tree
 
 set -e
-
-# --- Check environment --------------------------------------------------------
-if [ ! -x /usr/bin/mkimage ]; then
-    echo "Missing u-boot tools"
-    echo "Please install them from http://www.slackware.com/~alien/slackbuilds/u-boot-tools/"
-    exit 1
-fi
 
 # --- Configuration -------------------------------------------------------------
 #change to your needs
@@ -86,14 +80,6 @@ echo "------ Clone / Pull sources and patch"
 mkdir -p $DEST/output
 cp output/uEnv.txt $DEST/output
 
-# # u-boot tools
-# if [ -d "$DEST/u-boot" ]; then
-#     ( cd $DEST/u-boot;
-#       git pull )
-# else
-#     git clone git://git.denx.de/u-boot.git $DEST/u-boot
-# fi
-
 # Boot loader
 if [ -d "$DEST/u-boot-sunxi" ]; then
     ( cd $DEST/u-boot-sunxi;
@@ -147,21 +133,12 @@ echo "------ Compiling kernel boot loaderb"
 # Copying Kernel config
 cp $CWD/config/kernel.config $DEST/linux-sunxi/
 
-# echo "------ Compiling mkimage"
-# cd $DEST/u-boot
-# touch include/autoconf.mk
-# touch include/autoconf.mk.dep
-# mkdir include/generated
-# touch include/generated/generic-asm-offsets.h
-# touch lib/asm-offsets.s
-# touch {arch/arm/cpu/arm926ejs,examples/standalone,tools,tools/env}/.depend
-# make tools HOSTCC="gcc $SLKCFLAGS" HOSTSTRIP=/bin/true CROSS_COMPILE=""
-# export PATH=$PATH:$(pwd)/tools/
-
 echo "------ Compiling boot loader"
 cd $DEST/u-boot-sunxi
 make clean
 make -j2 'cubietruck' CROSS_COMPILE=$CROSS_COMPILE
+make HOSTCC=gcc CROSS_COMPILE='' tools
+PATH=$PATH:$DEST/u-boot-sunxi/tools/
 
 echo "------ Compiling sunxi tools"
 cd $DEST/sunxi-tools
@@ -205,7 +182,7 @@ cd $DEST/output
 dd if=/dev/zero of=${IMG_NAME}-${VERSION}_rootfs_SD.raw bs=1M count=$IMAGE_SIZE_MB
 
 LOOP0=$(losetup -f)
-losetup $LOOP0 slackware_rootfs.raw
+losetup $LOOP0 ${IMG_NAME}-${VERSION}_rootfs_SD.raw
 
 echo "------ Partitionning and mounting filesystem"
 # make image bootable
