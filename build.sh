@@ -18,18 +18,19 @@ fi
 
 # --- Configuration -------------------------------------------------------------
 #change to your needs
-VERSION="SlackwareARM_0.1"
-DEST_LANG="en_US"
-DEST_LANGUAGE="us"
-COMPILE="true"
-DEST=/home/cycojesus/cubieslack
-DISPLAY=3  # "3:hdmi; 4:vga"
-IMAGE_SIZE_MB=2000
-SLACKWARE_VERSION=14.1
-ROOTFS_VERSION=04Nov13
-CONFIG_HZ=300HZ  # 250HZ, 300HZ or 1000HZ
-# --- End -----------------------------------------------------------------------
+IMG_NAME=${IMG_NAME:-"SlackwareARM_cubitruck"}
+VERSION=${VERSION:-0.2}
+DEST_LANG=${DEST_LANG:-"en_US"}
+DEST_LANGUAGE=${DEST_LANGUAGE:-"us"}
+COMPILE=${COMPILE:-"true"}
+DEST=${DEST:-~/cubieslack}
+DISPLAY=${DISPLAY:-3}  # "3:hdmi; 4:vga"
+IMAGE_SIZE_MB=${IMAGE_SIZE_MB:-2000}
+SLACKWARE_VERSION=${SLACKWARE_VERSION:-14.1}
+ROOTFS_VERSION=${ROOTFS_VERSION:-04Nov13}
+CONFIG_HZ=${CONFIG_HZ:-300HZ}  # 250HZ, 300HZ or 1000HZ
 
+# --- Script --------------------------------------------------------------------
 SRC=$(pwd)
 CWD=$(pwd)
 set -e
@@ -197,8 +198,10 @@ fi
 #--------------------------------------------------------------------------------
 echo "------ Creating SD Images"
 cd $DEST/output
-# create 2Gb image and mount image to next free loop device
-dd if=/dev/zero of=slackware_rootfs.raw bs=1M count=$IMAGE_SIZE_MB
+
+# create image and mount image to next free loop device
+dd if=/dev/zero of=${IMG_NAME}-${VERSION}_rootfs_SD.raw bs=1M count=$IMAGE_SIZE_MB
+
 LOOP0=$(losetup -f)
 losetup $LOOP0 slackware_rootfs.raw
 
