@@ -2,3 +2,4 @@ output
 /gcc-linaro-arm-linux-gnueabihf-*
 /bin/bin2fex
 /bin/fex2bin
+/slack-*-miniroot*.tar.xz
