@@ -207,10 +207,9 @@ mount $LOOP1 $DEST/output/sdcard/
 
 echo "------ Get basic Slackware System"
 cd $DEST/output/sdcard/
-wget -c ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/roots/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz
-tar xf slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz
+wget -c ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/roots/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz -O $CWD/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz
+tar xf $CWD/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz
 sync
-rm slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz
 
 cat > $DEST/output/sdcard/etc/motd <<EOF
 	      _      _        _                       _
