@@ -11,7 +11,7 @@
 #    ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/scripts/
 # * DONE compile mkimage as part of the build process?
 # * TODO organize patches by corresponding sources
-# * TODO review $CWD/scripts/resize2fs-arch.sh
+# * DONE review $CWD/scripts/resize2fs-arch.sh
 # * TODO compile out-of-tree
 
 set -e
