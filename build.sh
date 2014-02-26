@@ -225,15 +225,11 @@ cp $CWD/scripts/disable_led.sh $DEST/output/sdcard/bin/disable_led.sh
 
 # make it executable
 chmod +x $DEST/output/sdcard/bin/disable_led.sh
-# and startable on boot
-echo disable_led.sh > $DEST/output/sdcard/etc/rc.d/rc.local
 
 # scripts for autoresize at first boot from cubian
 cp $CWD/scripts/resize2fs-arch.sh $DEST/output/sdcard/root/resize2fs-root.sh
 # make it executable
 chmod +x $DEST/output/sdcard/root/resize2fs-root.sh
-# and startable on boot just execute it once not on every boot!!!
-#echo cubian-resize2fs > $DEST/output/sdcard/etc/rc.conf
 
 # script to install to NAND
 cp $CWD/scripts/nand-install.sh $DEST/output/sdcard/root
