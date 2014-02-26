@@ -26,7 +26,7 @@ DISPLAY=${DISPLAY:-"HDMI"}  # "HDMI" or "VGA"
 IMAGE_SIZE_MB=${IMAGE_SIZE_MB:-2000}
 SLACKWARE_VERSION=${SLACKWARE_VERSION:-14.1}
 ROOTFS_VERSION=${ROOTFS_VERSION:-04Nov13}
-CONFIG_HZ=${CONFIG_HZ:-300HZ}  # 250HZ, 300HZ or 1000HZ
+#CONFIG_HZ=${CONFIG_HZ:-300HZ}  # 250HZ, 300HZ or 1000HZ
 TOOLCHAIN_VERSION=${TOOLCHAIN_VERSION:-4.8-2013.10}
 TOOLCHAIN_URL_RANDOM_NUMBER=${TOOLCHAIN_URL_RANDOM_NUMBER:-155358238}
 
@@ -104,7 +104,7 @@ else
     git clone https://github.com/patrickhwood/linux-sunxi $DEST/linux-sunxi
 
     ###PATCH kernel CONFIG_HZ, Arm dfault is hardcoded 100hz (10ms latency!). For mulitimedia and desktop a higher frequency is recomended.
-    test -f $CWD/patch/$CONFIG_HZ.patch && patch -f $DEST/linux-sunxi/arch/arm/Kconfig < $CWD/patch/$CONFIG_HZ.patch
+    #test -f $CWD/patch/$CONFIG_HZ.patch && patch -f $DEST/linux-sunxi/arch/arm/Kconfig < $CWD/patch/$CONFIG_HZ.patch
 fi
 
 #--------------------------------------------------------------------------------
