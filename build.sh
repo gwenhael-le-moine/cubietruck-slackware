@@ -22,7 +22,7 @@ IMG_NAME=${IMG_NAME:-"SlackwareARM_cubitruck"}
 VERSION=${VERSION:-0.2}
 COMPILE=${COMPILE:-"true"}
 DEST=${DEST:-~/cubieslack}
-DISPLAY=${DISPLAY:-3}  # "3:hdmi; 4:vga"
+DISPLAY=${DISPLAY:-"HDMI"}  # "HDMI" or "VGA"
 IMAGE_SIZE_MB=${IMAGE_SIZE_MB:-2000}
 SLACKWARE_VERSION=${SLACKWARE_VERSION:-14.1}
 ROOTFS_VERSION=${ROOTFS_VERSION:-04Nov13}
@@ -248,11 +248,15 @@ cp $DEST/output/uEnv.txt $DEST/output/sdcard/boot/
 cp $DEST/linux-sunxi/arch/arm/boot/uImage $DEST/output/sdcard/boot/
 
 # copy proper bin file
-if [ $DISPLAY = 4 ]; then
-    cp $DEST/output/script-vga.bin $DEST/output/sdcard/boot/script.bin
-else
-    cp $DEST/output/script-hdmi.bin $DEST/output/sdcard/boot/script.bin
-fi
+case $DISPLAY in
+    "VGA")				# VGA
+	cp $DEST/output/script-vga.bin $DEST/output/sdcard/boot/script.bin
+	;;
+    "HDMI")				# HDMI
+	cp $DEST/output/script-hdmi.bin $DEST/output/sdcard/boot/script.bin
+	;;
+    *) exit 1
+esac
 
 cp -R $DEST/linux-sunxi/output/lib/modules $DEST/output/sdcard/lib/
 cp -R $DEST/linux-sunxi/output/lib/firmware/ $DEST/output/sdcard/lib/
