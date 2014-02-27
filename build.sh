@@ -245,14 +245,6 @@ esac
 cp -R $DEST/linux-sunxi/output/lib/modules $DEST/output/sdcard/lib/
 cp -R $DEST/linux-sunxi/output/lib/firmware/ $DEST/output/sdcard/lib/
 
-# sunxi-tools
-cd $DEST/sunxi-tools
-make clean
-make -j2 'fex2bin' 'bin2fex' 'nand-part' CC=${CROSS_COMPILE}gcc
-
-mkdir -p $DEST/output/sdcard/usr/bin/
-cp fex2bin bin2fex nand-part $DEST/output/sdcard/usr/bin/
-
 # umount images
 umount $DEST/output/sdcard/
 losetup -d $LOOP1
