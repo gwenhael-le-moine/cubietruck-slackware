@@ -1,6 +1,7 @@
 # --- TODO
 
 * DOING clean up script
+* TODO clean up binaries and bundled files
 * TODO build rootfs from slackwarearm-current
    ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/scripts/
 * TODO organize patches by corresponding sources
