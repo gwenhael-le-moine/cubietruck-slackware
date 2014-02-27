@@ -8,8 +8,6 @@ http://www.igorpecovnik.com/2013/12/24/cubietruck-debian-wheezy-sd-card-image/
 Installation steps Slackware for Cubietruck
 ---------------------------------------------------------
 
-0. Use a debian based Linux Distribution! (sleazy, I know, we'll keep it that way until it can be hosted on a real distribution)
-
 1. open your preferred shell
 
 2. su -
@@ -22,7 +20,7 @@ Installation steps Slackware for Cubietruck
 
 6. chmod +x build.sh
 
-7. sudo ./build.sh
+7. ./build.sh
 
 8. cd ~/cubieslack/output
 
