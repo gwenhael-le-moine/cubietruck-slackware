@@ -193,6 +193,12 @@ cp $CWD/scripts/disable_led.sh $DEST/output/sdcard/bin/disable_led.sh
 # make it executable
 chmod +x $DEST/output/sdcard/bin/disable_led.sh
 
+cat <<EOF >> $DEST/output/sdcard/etc/rc.d/rc.local
+
+# Uncomment the following line to turn off the leds after booting
+# /bin/disable_led.sh
+EOF
+
 # scripts for autoresize at first boot from cubian
 cp $CWD/scripts/resize2fs-arch.sh $DEST/output/sdcard/root/resize2fs-root.sh
 # make it executable
