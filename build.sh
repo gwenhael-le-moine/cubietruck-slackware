@@ -254,7 +254,7 @@ sync
 sleep 3
 
 echo "umount images"
-umount $DEST/output/sdcard/
+umount -d -l $DEST/output/sdcard/
 losetup -d $LOOP1
 losetup -d $LOOP0
 
