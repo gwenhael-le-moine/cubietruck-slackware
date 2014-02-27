@@ -258,5 +258,8 @@ umount -d -l $DEST/output/sdcard/
 losetup -d $LOOP1
 losetup -d $LOOP0
 
+echo "cleaning"
+rm -r $DEST/output/sdcard/
+
 echo "compress image"
 gzip $DEST/output/*.raw
