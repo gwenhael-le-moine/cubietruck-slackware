@@ -1,5 +1,6 @@
 # --- TODO
 
+* TODO offer pre-built binaries
 * TODO allow for running on ARM host
 * TODO build rootfs from slackwarearm-current
    ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/scripts/
