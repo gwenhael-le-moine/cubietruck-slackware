@@ -18,7 +18,7 @@ Installation steps Slackware for Cubietruck
 
 7. DEST=/output/path IMAGE_SIZE_MB=2000 ./build.sh # see build.sh for more possible parameters
 
-8. cd ~/cubieslack/output
+8. cd /output/path/output
 
 9. gunzip <image>.raw.gz
 
