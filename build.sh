@@ -211,14 +211,11 @@ cp $CWD/bin/nand1-boot-cubietruck-arch.tgz $DEST/output/sdcard/root
 # set hostname
 echo darkstar > $DEST/output/sdcard/etc/HOSTNAME
 
+# setup fstab
 ### declare root partition in fstab
 echo '/dev/mmcblk0p1	/	ext4	defaults		1	1' >> $DEST/output/sdcard/etc/fstab
-
 ### mount /tmp as tmpfs
 echo 'tmpfs	/tmp	tmpfs	defaults,nosuid,size=30%	0	0' >> $DEST/output/sdcard/etc/fstab
-
-
-
 
 # modules to load
 cat >> $DEST/output/sdcard/etc/rc.d/rc.modules <<EOT
