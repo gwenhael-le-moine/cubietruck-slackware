@@ -1,14 +1,14 @@
 # --- TODO
 
-* DOING clean up script
 * TODO allow for running on ARM host
-* TODO clean up binaries and bundled files
 * TODO build rootfs from slackwarearm-current
    ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/scripts/
-* TODO organize patches by corresponding sources
 * TODO compile out-of-tree
 * TODO switch userland to hard-float binaries
 * TODO package the kernel in a real slackware package
+* DONE clean up script
+* DONE clean up binaries and bundled files
+* DONE organize patches by corresponding sources
 * DONE remove dependance on debian based host
 ** DONE use linaro toolchain
     https://launchpad.net/linaro-toolchain-binaries/trunk/
