@@ -1,19 +1,5 @@
 #!/bin/bash
 
-# --- TODO
-# * DONE remove dependance on debian based host
-# ** DONE use linaro toolchain
-#     https://launchpad.net/linaro-toolchain-binaries/trunk/
-# * DOING clean up script
-# * TODO package the kernel in a real slackware package
-# * TODO switch userland to hard-float binaries
-# * TODO build rootfs from slackwarearm-current
-#    ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/scripts/
-# * DONE compile mkimage as part of the build process?
-# * TODO organize patches by corresponding sources
-# * DONE review $CWD/scripts/resize2fs-arch.sh
-# * TODO compile out-of-tree
-
 set -e
 
 # --- Configuration -------------------------------------------------------------
