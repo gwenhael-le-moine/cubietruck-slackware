@@ -204,10 +204,6 @@ cp $CWD/scripts/resize2fs-arch.sh $DEST/output/sdcard/root/resize2fs-root.sh
 # make it executable
 chmod +x $DEST/output/sdcard/root/resize2fs-root.sh
 
-# script to install to NAND
-cp $CWD/scripts/nand-install.sh $DEST/output/sdcard/root
-cp $CWD/bin/nand1-boot-cubietruck-arch.tgz $DEST/output/sdcard/root
-
 # set hostname
 echo darkstar > $DEST/output/sdcard/etc/HOSTNAME
 
