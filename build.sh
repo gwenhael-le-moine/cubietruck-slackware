@@ -19,6 +19,11 @@ ROOTFS_VERSION=${ROOTFS_VERSION:-04Nov13}
 TOOLCHAIN_VERSION=${TOOLCHAIN_VERSION:-4.8-2013.10}
 TOOLCHAIN_URL_RANDOM_NUMBER=${TOOLCHAIN_URL_RANDOM_NUMBER:-155358238}
 
+PACKAGE_BINARIES=false
+
+CWD=$(pwd)
+BINARIES_DIR=$CWD/binaries
+
 # commandline arguments processing
 while [ "x$1" != "x" ]
 do
@@ -55,6 +60,10 @@ do
 	    DEST=$1
 	    shift
 	    ;;
+	--package-binaries )
+	    shift
+	    PACKAGE_BINARIES=true
+	    ;;
 	-v | --image-version )
 	    shift
 	    VERSION=$1
@@ -80,6 +89,9 @@ do
 	    echo -e "\t-n | --image-name [\"nom\"] (default: $IMG_NAME)"
 	    echo -e "\t-r | --rootfs-version [\"version number\"] (default: $ROOTFS_VERSION)"
 	    echo -e "\t-o | --output [/directory/] (default: $DEST)"
+	    echo -e "\t     --package-binaries"
+	    echo -e "\t\tpackage compiled binaries into $BINARIES_DIR-$VERSION.tar.xz"
+	    echo -e "\t\t(combine with --compile)"
 	    echo -e "\t-v | --image-version [\"version number\"] (default: $VERSION)"
 	    echo -e "\t-xv | --toolchain-version [\"version number\"] (default: $TOOLCHAIN_VERSION)"
 	    echo -e "\t-xumn | --toolchain-url-magic-number [\"magic number\"] (default: $TOOLCHAIN_URL_RANDOM_NUMBER)"
@@ -90,9 +102,6 @@ do
 done
 
 # --- Script --------------------------------------------------------------------
-CWD=$(pwd)
-BINARIES_DIR=$CWD/binaries
-
 mkdir -p $DEST
 
 echo "Building Cubietruck-Slackware in $DEST from $CWD"
@@ -208,6 +217,9 @@ if [ "$COMPILE" = "true" ]; then
     )
 fi
 
+if [ "$PACKAGE_BINARIES" = "true" ]; then
+    tar Jcf $BINARIES_DIR-$VERSION{.tar.xz,}
+fi
 
 
 
