@@ -2,7 +2,6 @@
 
 * DONE [#A] offer pre-built binaries
 * DONE [#A] configure by passing --parameters
-* TODO [#A] reinstall mpfr and/or aaa_elflids to fix missing libmpfr...so
 * DONE [#B] UNTESTED allow for running on ARM host
 * TODO [#B] build rootfs from slackwarearm-current
    ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/scripts/
