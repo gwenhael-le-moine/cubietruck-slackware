@@ -7,6 +7,8 @@ if [ "$UID" -ne 0 ]; then
     echo "Please run as root"
 fi
 
+CWD=$(pwd)
+
 # --- Configuration -------------------------------------------------------------
 IMG_NAME=${IMG_NAME:-"SlackwareARM_cubitruck"}
 VERSION=${VERSION:-0.2}
@@ -21,7 +23,6 @@ TOOLCHAIN_URL_RANDOM_NUMBER=${TOOLCHAIN_URL_RANDOM_NUMBER:-155358238}
 
 PACKAGE_BINARIES=false
 
-CWD=$(pwd)
 BINARIES_DIR=$CWD/binaries
 
 # commandline arguments processing
@@ -107,7 +108,6 @@ mkdir -p $DEST
 echo "Building Cubietruck-Slackware in $DEST from $CWD"
 
 if [ "$COMPILE" = "true" ]; then
-
     mkdir -p $BINARIES_DIR
 
     echo "--------------------------------------------------------------------------------"
@@ -215,10 +215,19 @@ if [ "$COMPILE" = "true" ]; then
       cp -R $DEST/linux-sunxi/output/lib/modules $BINARIES_DIR/$(basename $(pwd))
       cp -R $DEST/linux-sunxi/output/lib/firmware/ $BINARIES_DIR/$(basename $(pwd))
     )
+else
+    if [ ! -e $BINARIES_DIR ]; then
+	echo "ERROR"
+	echo "Necesary binaries files not present !"
+	echo "Either run $0 --compile or download them from https://bitbucket.org/gwenhael/cubietruck-slackware/downloads"
+	echo "and untar them here."
+
+	exit 99
+    fi
 fi
 
 if [ "$PACKAGE_BINARIES" = "true" ]; then
-    tar Jcf $BINARIES_DIR-$VERSION{.tar.xz,}
+    tar Jcf $BINARIES_DIR-$VERSION.tar.xz $BINARIES_DIR
 fi
 
 
