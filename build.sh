@@ -19,6 +19,72 @@ ROOTFS_VERSION=${ROOTFS_VERSION:-04Nov13}
 TOOLCHAIN_VERSION=${TOOLCHAIN_VERSION:-4.8-2013.10}
 TOOLCHAIN_URL_RANDOM_NUMBER=${TOOLCHAIN_URL_RANDOM_NUMBER:-155358238}
 
+# commandline arguments processing
+while [ "x$1" != "x" ]
+do
+    case "$1" in
+	-c | --compile )
+	    shift
+	    COMPILE="true"
+	    ;;
+	-dc | --dont-compile )
+	    shift
+	    COMPILE="false"
+	    ;;
+	-d | --display )
+	    shift
+	    CUBIETRUCK_DISPLAY=$1
+	    shift
+	    ;;
+	-n | --image-name )
+	    shift
+	    IMG_NAME=$1
+	    shift
+	    ;;
+	-r | --rootfs-version )
+	    shift
+	    ROOTFS_VERSION=$1
+	    shift
+	    ;;
+	-o | --output )
+	    shift
+	    DEST=$1
+	    shift
+	    ;;
+	-v | --image-version )
+	    shift
+	    VERSION=$1
+	    shift
+	    ;;
+	-xv | --toolchain-version )
+	    shift
+	    TOOLCHAIN_VERSION=$1
+	    shift
+	    ;;
+	-xumn | --toolchain-url-magic-number )
+	    shift
+	    TOOLCHAIN_URL_RANDOM_NUMBER=$1
+	    shift
+	    ;;
+
+	-h | --help )
+	    echo -e "Usage: run as root: $0 <options>"
+	    echo -e "Options:"
+	    echo -e "\t-c | --compile"
+	    echo -e "\t-dc | --dont-compile"
+	    echo -e "\t-d | --display [\"HDMI\"|\"VGA\"] (default: $CUBIETRUCK_DISPLAY)"
+	    echo -e "\t-n | --image-name [\"nom\"] (default: $IMG_NAME)"
+	    echo -e "\t-r | --rootfs-version [\"version number\"] (default: $ROOTFS_VERSION)"
+	    echo -e "\t-o | --output [/directory/] (default: $DEST)"
+	    echo -e "\t-v | --image-version [\"version number\"] (default: $VERSION)"
+	    echo -e "\t-xv | --toolchain-version [\"version number\"] (default: $TOOLCHAIN_VERSION)"
+	    echo -e "\t-xumn | --toolchain-url-magic-number [\"magic number\"] (default: $TOOLCHAIN_URL_RANDOM_NUMBER)"
+
+	    exit 0
+	    ;;
+    esac
+done
+
 # --- Script --------------------------------------------------------------------
 CWD=$(pwd)
 
