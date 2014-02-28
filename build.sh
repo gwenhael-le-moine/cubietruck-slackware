@@ -129,6 +129,11 @@ if [ "$COMPILE" = "true" ]; then
 	# Applying Patch for 2gb memory
 	patch -f $DEST/u-boot-sunxi/include/configs/sunxi-common.h < $CWD/patch/memory.patch || true
     fi
+    echo "------ Compiling boot loader"
+    ( cd $DEST/u-boot-sunxi
+      make clean
+      make -j2 'cubietruck' CROSS_COMPILE=$CROSS_COMPILE
+      make HOSTCC=gcc CROSS_COMPILE='' tools )
 
     # Allwinner tools
     if [ -d "$DEST/sunxi-tools" ]; then
@@ -137,6 +142,10 @@ if [ "$COMPILE" = "true" ]; then
     else
 	git clone https://github.com/linux-sunxi/sunxi-tools.git $DEST/sunxi-tools
     fi
+    echo "------ Compiling sunxi tools"
+    ( cd $DEST/sunxi-tools
+      make clean
+      make fex2bin bin2fex )
 
     # Hardware configurations
     if [ -d "$DEST/cubie_configs" ]; then
@@ -160,42 +169,23 @@ if [ "$COMPILE" = "true" ]; then
     else
 	git clone https://github.com/patrickhwood/linux-sunxi $DEST/linux-sunxi
     fi
-fi
-
-echo "--------------------------------------------------------------------------------"
-echo "Compiling everything"
-echo "--------------------------------------------------------------------------------"
-
-
-if [ "$COMPILE" = "true" ]; then
-    echo "------ Compiling boot loader"
-    cd $DEST/u-boot-sunxi
-    make clean
-    make -j2 'cubietruck' CROSS_COMPILE=$CROSS_COMPILE
-    make HOSTCC=gcc CROSS_COMPILE='' tools
-
-    echo "------ Compiling sunxi tools"
-    cd $DEST/sunxi-tools
-    make clean
-    make fex2bin bin2fex
-
     PATH=$PATH:$DEST/u-boot-sunxi/tools/
 
     echo "------ Compiling kernel"
-    cd $DEST/linux-sunxi
-    make clean
+    ( cd $DEST/linux-sunxi
+      make clean
 
-    # Adding wlan firmware to kernel source
-    ( cd $DEST/linux-sunxi/firmware;
-      unzip -o $CWD/bin/ap6210.zip )
+      # Adding wlan firmware to kernel source
+      ( cd $DEST/linux-sunxi/firmware;
+	unzip -o $CWD/bin/ap6210.zip )
 
-    make -j2 ARCH=arm CROSS_COMPILE=$CROSS_COMPILE sun7i_defconfig
+      make -j2 ARCH=arm CROSS_COMPILE=$CROSS_COMPILE sun7i_defconfig
 
-    # get proven config
-    cp $CWD/config/kernel.config $DEST/linux-sunxi/.config
-    make -j2 ARCH=arm CROSS_COMPILE=$CROSS_COMPILE uImage modules
-    make -j2 ARCH=arm CROSS_COMPILE=$CROSS_COMPILE INSTALL_MOD_PATH=output modules_install
-    make -j2 ARCH=arm CROSS_COMPILE=$CROSS_COMPILE INSTALL_HDR_PATH=output headers_install
+      # get proven config
+      cp $CWD/config/kernel.config $DEST/linux-sunxi/.config
+      make -j2 ARCH=arm CROSS_COMPILE=$CROSS_COMPILE uImage modules
+      make -j2 ARCH=arm CROSS_COMPILE=$CROSS_COMPILE INSTALL_MOD_PATH=output modules_install
+      make -j2 ARCH=arm CROSS_COMPILE=$CROSS_COMPILE INSTALL_HDR_PATH=output headers_install )
 fi
 
 
