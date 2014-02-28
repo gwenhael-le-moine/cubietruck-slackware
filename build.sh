@@ -228,6 +228,8 @@ fi
 
 if [ "$PACKAGE_BINARIES" = "true" ]; then
     tar Jcf $BINARIES_DIR-$VERSION.tar.xz $BINARIES_DIR
+
+    exit -1
 fi
 
 
