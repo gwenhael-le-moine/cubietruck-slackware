@@ -36,6 +36,10 @@ do
 	    CUBIETRUCK_DISPLAY=$1
 	    shift
 	    ;;
+	-gz | --compress )
+	    shift
+	    COMPRESS="true"
+	    ;;
 	-n | --image-name )
 	    shift
 	    IMG_NAME=$1
@@ -331,5 +335,7 @@ losetup -d $LOOP0
 echo "cleaning"
 rm -r $DEST/output/sdcard/
 
-echo "compress image"
-gzip $DEST/output/*.raw
+if [ "$COMPRESS" = "true" ]; then
+    echo "compress image"
+    gzip $DEST/output/*.raw
+fi
