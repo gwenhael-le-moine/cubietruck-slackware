@@ -130,7 +130,7 @@ if [ "$COMPILE" = "true" ]; then
 	git clone https://github.com/cubieboard/u-boot-sunxi $DEST/u-boot-sunxi
 
 	# Applying Patch for 2gb memory
-	patch -f $DEST/u-boot-sunxi/include/configs/sunxi-common.h < $CWD/patch/memory.patch || true
+	patch -f $DEST/u-boot-sunxi/include/configs/sunxi-common.h < $CWD/patches/u-boot-sunxi/memory.patch || true
     fi
     echo "------ Compiling boot loader"
     ( cd $DEST/u-boot-sunxi
