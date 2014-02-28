@@ -339,11 +339,11 @@ EOT
 
 
 echo "remove the preconfigured boot and setup ours"
-rm -rf $DEST/output/sdcard/boot/
-mkdir -p $DEST/output/sdcard/boot/
-cat <<EOF > $DEST/output/sdcard/boot/uEnv.txt
-root=/dev/mmcblk0p1 ro
-extraargs=console=tty0,115200 sunxi_no_mali_mem_reserve sunxi_g2d_mem_reserve=0 sunxi_ve_mem_reserve=0 hdmi.audio=EDID:0 disp.screen0_output_mode=EDID:1280x720p50 rootwait panic=10 rootfstype=ext4 rootflags=discard
+rm -rf $DEST/image/sdcard/boot/
+mkdir -p $DEST/image/sdcard/boot/
+cat <<EOF > $DEST/image/sdcard/boot/uEnv.txt
+root=/dev/mmcblk0p1
+extraargs=console=tty0,115200 sunxi_no_mali_mem_reserve sunxi_g2d_mem_reserve=0 sunxi_ve_mem_reserve=0 hdmi.audio=EDID:0 disp.screen0_output_mode=EDID:1280x720p50 rootwait
 panic=10 rootfstype=ext4 rootflags=discard
 EOF
 
