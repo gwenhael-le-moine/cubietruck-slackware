@@ -239,6 +239,7 @@ fi
 echo "--------------------------------------------------------------------------------"
 echo "Creating SD Image"
 echo "--------------------------------------------------------------------------------"
+mkdir -p $DEST/output
 cd $DEST/output
 
 echo "create image and mount image to next free loop device"
