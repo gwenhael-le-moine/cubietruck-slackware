@@ -1,5 +1,6 @@
 # --- TODO
 
+* TODO [#A] in order of preference try kernel.org, linux-sinxi kernels to replace patwood
 * TODO [#A] add --clean
 * TODO [#B] build rootfs from slackwarearm-current
    ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/scripts/
