@@ -91,12 +91,15 @@ done
 
 # --- Script --------------------------------------------------------------------
 CWD=$(pwd)
+BINARIES_DIR=$CWD/binaries
 
 mkdir -p $DEST
 
 echo "Building Cubietruck-Slackware in $DEST from $CWD"
 
 if [ "$COMPILE" = "true" ]; then
+
+    mkdir -p $BINARIES_DIR
 
     echo "--------------------------------------------------------------------------------"
     echo "Downloading necessary files for building - aka Toolchain"
@@ -133,7 +136,11 @@ if [ "$COMPILE" = "true" ]; then
     ( cd $DEST/u-boot-sunxi
       make clean CROSS_COMPILE=$CROSS_COMPILE
       make -j2 'cubietruck' CROSS_COMPILE=$CROSS_COMPILE
-      make HOSTCC=gcc CROSS_COMPILE='' tools )
+      make HOSTCC=gcc CROSS_COMPILE='' tools
+
+      mkdir -p $BINARIES_DIR/$(basename $(pwd))
+      mv tools/mkimage $BINARIES_DIR/$(basename $(pwd))
+    )
 
     # Allwinner tools
     if [ -d "$DEST/sunxi-tools" ]; then
@@ -145,7 +152,11 @@ if [ "$COMPILE" = "true" ]; then
     echo "------ Compiling sunxi tools"
     ( cd $DEST/sunxi-tools
       make clean
-      make fex2bin bin2fex )
+      make fex2bin bin2fex
+
+      mkdir -p $BINARIES_DIR/$(basename $(pwd))
+      mv fexc fex2bin bin2fex $BINARIES_DIR/$(basename $(pwd))
+    )
 
     # Hardware configurations
     if [ -d "$DEST/cubie_configs" ]; then
@@ -161,6 +172,9 @@ if [ "$COMPILE" = "true" ]; then
 	sed -e 's/screen0_output_type.*/screen0_output_type     = 3/g' $DEST/cubie_configs/sysconfig/linux/ct.fex > $DEST/cubie_configs/sysconfig/linux/ct-hdmi.fex
 	sed -e 's/screen0_output_type.*/screen0_output_type     = 4/g' $DEST/cubie_configs/sysconfig/linux/ct.fex > $DEST/cubie_configs/sysconfig/linux/ct-vga.fex
     fi
+    mkdir -p $BINARIES_DIR/cubie_configs
+    $BINARIES_DIR/sunxi-tools/fex2bin $DEST/cubie_configs/sysconfig/linux/ct-vga.fex $BINARIES_DIR/cubie_configs/script-vga.bin
+    $BINARIES_DIR/sunxi-tools/fex2bin $DEST/cubie_configs/sysconfig/linux/ct-hdmi.fex $BINARIES_DIR/cubie_configs/script-hdmi.bin
 
     # Patwood's kernel 3.4.75+
     if [ -d "$DEST/linux-sunxi" ]; then
@@ -169,10 +183,10 @@ if [ "$COMPILE" = "true" ]; then
     else
 	git clone https://github.com/patrickhwood/linux-sunxi $DEST/linux-sunxi
     fi
-    PATH=$PATH:$DEST/u-boot-sunxi/tools/
-
     echo "------ Compiling kernel"
     ( cd $DEST/linux-sunxi
+      PATH=$PATH:$BINARIES_DIR/u-boot-sunxi/
+
       make clean
 
       # Adding wlan firmware to kernel source
@@ -185,7 +199,13 @@ if [ "$COMPILE" = "true" ]; then
       cp $CWD/config/kernel.config $DEST/linux-sunxi/.config
       make -j2 ARCH=arm CROSS_COMPILE=$CROSS_COMPILE uImage modules
       make -j2 ARCH=arm CROSS_COMPILE=$CROSS_COMPILE INSTALL_MOD_PATH=output modules_install
-      make -j2 ARCH=arm CROSS_COMPILE=$CROSS_COMPILE INSTALL_HDR_PATH=output headers_install )
+      make -j2 ARCH=arm CROSS_COMPILE=$CROSS_COMPILE INSTALL_HDR_PATH=output headers_install
+
+      mkdir -p $BINARIES_DIR/$(basename $(pwd))
+      cp $DEST/linux-sunxi/arch/arm/boot/uImage $BINARIES_DIR/$(basename $(pwd))
+      cp -R $DEST/linux-sunxi/output/lib/modules $BINARIES_DIR/$(basename $(pwd))
+      cp -R $DEST/linux-sunxi/output/lib/firmware/ $BINARIES_DIR/$(basename $(pwd))
+    )
 fi
 
 
@@ -300,18 +320,18 @@ echo "setup video output"
 echo $CUBIETRUCK_DISPLAY
 case $CUBIETRUCK_DISPLAY in
     VGA)				# VGA
-	$DEST/sunxi-tools/fex2bin $DEST/cubie_configs/sysconfig/linux/ct-vga.fex$DEST/output/sdcard/boot/script.bin
+	cp $BINARIES_DIR/cubie_configs/script-vga.bin $DEST/output/sdcard/boot/script.bin
 	;;
     HDMI)				# HDMI
-	$DEST/sunxi-tools/fex2bin $DEST/cubie_configs/sysconfig/linux/ct-hdmi.fex $DEST/output/sdcard/boot/script.bin
+	cp $BINARIES_DIR/cubie_configs/script-hdmi.bin $DEST/output/sdcard/boot/script.bin
 	;;
     *) exit 1
 esac
 
 echo "Installing kernel"
-cp $DEST/linux-sunxi/arch/arm/boot/uImage $DEST/output/sdcard/boot/
-cp -R $DEST/linux-sunxi/output/lib/modules $DEST/output/sdcard/lib/
-cp -R $DEST/linux-sunxi/output/lib/firmware/ $DEST/output/sdcard/lib/
+cp $BINARIES_DIR/linux-sunxi/uImage $DEST/output/sdcard/boot/
+cp -R $BINARIES_DIR/linux-sunxi/modules $DEST/output/sdcard/lib/
+cp -R $BINARIES_DIR/linux-sunxi/firmware/ $DEST/output/sdcard/lib/
 
 sync
 
