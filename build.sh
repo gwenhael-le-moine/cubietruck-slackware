@@ -337,5 +337,5 @@ rm -r $DEST/output/sdcard/
 
 if [ "$COMPRESS" = "true" ]; then
     echo "compress image"
-    gzip $DEST/output/*.raw
+    xz -z $DEST/output/${IMG_NAME}-${VERSION}_rootfs_SD.raw
 fi
