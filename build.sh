@@ -131,7 +131,7 @@ if [ "$COMPILE" = "true" ]; then
     fi
     echo "------ Compiling boot loader"
     ( cd $DEST/u-boot-sunxi
-      make clean
+      make clean CROSS_COMPILE=$CROSS_COMPILE
       make -j2 'cubietruck' CROSS_COMPILE=$CROSS_COMPILE
       make HOSTCC=gcc CROSS_COMPILE='' tools )
 
