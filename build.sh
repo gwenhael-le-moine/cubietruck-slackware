@@ -191,7 +191,7 @@ if [ "$COMPILE" = "true" ]; then
 
       # Adding wlan firmware to kernel source
       ( cd $DEST/linux-sunxi/firmware;
-	unzip -o $CWD/bin/ap6210.zip )
+	unzip -o $CWD/firmwares/ap6210.zip )
 
       make -j2 ARCH=arm CROSS_COMPILE=$CROSS_COMPILE sun7i_defconfig
 
