@@ -4,3 +4,4 @@ output
 /bin/fex2bin
 /slack-*-miniroot*.tar.xz
 /binaries
+/binaries-*.tar.xz
