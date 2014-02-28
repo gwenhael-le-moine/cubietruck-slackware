@@ -56,6 +56,11 @@ do
 	    ROOTFS_VERSION=$1
 	    shift
 	    ;;
+	-s | --image-size )
+	    shift
+	    IMAGE_SIZE_MB=$1
+	    shift
+	    ;;
 	-o | --output )
 	    shift
 	    DEST=$1
