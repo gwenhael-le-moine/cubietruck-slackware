@@ -16,17 +16,20 @@ Installation steps Slackware for Cubietruck
 
 6. chmod +x build.sh
 
-7. DEST=/output/path IMAGE_SIZE_MB=2000 ./build.sh # see build.sh for more possible parameters
+7. ./build.sh # see build.sh --help
 
-8. cd /output/path/output
+8. cd dist/image/
 
-9. gunzip <image>.raw.gz
-
-10. dd if=<image>.raw of=/dev/mmcblk0 bs=1024
+9. dd if=<image>.raw of=/dev/mmcblk0 bs=1024
 
 99. Enjoy Slackware :)
 
 
+---------------------------------------------------------
+Peculiarities
+---------------------------------------------------------
+* / is mount read-write from the start and this disturbs /etc/rc.d/rc.S so there will be a warning message during boot. Just press Enter to continue booting
+* default root password is 'password'
 
 
 
