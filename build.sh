@@ -10,7 +10,7 @@ fi
 # --- Configuration -------------------------------------------------------------
 IMG_NAME=${IMG_NAME:-"SlackwareARM_cubitruck"}
 VERSION=${VERSION:-0.2}
-COMPILE=${COMPILE:-"true"}
+COMPILE=${COMPILE:-"false"}
 DEST=${DEST:-~/cubieslack}
 CUBIETRUCK_DISPLAY=${CUBIETRUCK_DISPLAY:-"HDMI"}  # "HDMI" or "VGA"
 IMAGE_SIZE_MB=${IMAGE_SIZE_MB:-2000}
@@ -75,7 +75,7 @@ do
 	    echo -e "Usage: run as root: $0 <options>"
 	    echo -e "Options:"
 	    echo -e "\t-c | --compile"
-	    echo -e "\t-dc | --dont-compile"
+	    echo -e "\t-dc | --dont-compile (default)"
 	    echo -e "\t-d | --display [\"HDMI\"|\"VGA\"] (default: $CUBIETRUCK_DISPLAY)"
 	    echo -e "\t-n | --image-name [\"nom\"] (default: $IMG_NAME)"
 	    echo -e "\t-r | --rootfs-version [\"version number\"] (default: $ROOTFS_VERSION)"
