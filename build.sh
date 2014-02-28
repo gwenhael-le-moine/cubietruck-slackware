@@ -2,8 +2,12 @@
 
 set -e
 
+# Requires root ..
+if [ "$UID" -ne 0 ]; then
+    echo "Please run as root"
+fi
+
 # --- Configuration -------------------------------------------------------------
-#change to your needs
 IMG_NAME=${IMG_NAME:-"SlackwareARM_cubitruck"}
 VERSION=${VERSION:-0.2}
 COMPILE=${COMPILE:-"true"}
@@ -20,31 +24,31 @@ CWD=$(pwd)
 
 mkdir -p $DEST
 
-#Requires root ..
-if [ "$UID" -ne 0 ]; then
-    echo "Please run as root"
-fi
-
 echo "Building Cubietruck-Slackware in $DEST from $CWD"
 
-echo "--------------------------------------------------------------------------------"
-echo "Downloading necessary files for building - aka Toolchain"
-echo "--------------------------------------------------------------------------------"
-#Read this for further information if you run into problems with gcc compiler
-#http://linux-sunxi.org/Toolchain
-if [ ! -e $PWD/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux/ ]; then
-    [ ! -e $CWD/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux.tar.xz ] && wget -c https://launchpadlibrarian.net/$TOOLCHAIN_URL_RANDOM_NUMBER/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux.tar.xz -O $CWD/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux.tar.xz
-    tar xf $CWD/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux.tar.xz
-fi
-
-CROSS_COMPILE=$PWD/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux/bin/arm-linux-gnueabihf-
-
-echo "--------------------------------------------------------------------------------"
-echo "Clone / Pull sources and patch"
-echo "--------------------------------------------------------------------------------"
-mkdir -p $DEST/output
-
 if [ "$COMPILE" = "true" ]; then
+
+    echo "--------------------------------------------------------------------------------"
+    echo "Downloading necessary files for building - aka Toolchain"
+    echo "--------------------------------------------------------------------------------"
+    if $(uname -m | grep -q arm); then
+	CROSS_COMPILE=''
+    else
+	#Read this for further information if you run into problems with gcc compiler
+	#http://linux-sunxi.org/Toolchain
+	if [ ! -e $PWD/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux/ ]; then
+	    [ ! -e $CWD/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux.tar.xz ] && wget -c https://launchpadlibrarian.net/$TOOLCHAIN_URL_RANDOM_NUMBER/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux.tar.xz -O $CWD/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux.tar.xz
+	    tar xf $CWD/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux.tar.xz
+	fi
+
+	CROSS_COMPILE=$PWD/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux/bin/arm-linux-gnueabihf-
+    fi
+
+    echo "--------------------------------------------------------------------------------"
+    echo "Clone / Pull sources and patch"
+    echo "--------------------------------------------------------------------------------"
+    mkdir -p $DEST/output
+
     # Boot loader
     if [ -d "$DEST/u-boot-sunxi" ]; then
 	( cd $DEST/u-boot-sunxi;
