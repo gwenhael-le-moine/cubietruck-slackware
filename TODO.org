@@ -5,9 +5,9 @@
 * TODO [#B] compile out-of-tree
 * TODO [#B] switch userland to hard-float binaries
 * TODO [#B] package the kernel in a real slackware package
-* DONE [#A] offer pre-built binaries
-* DONE [#A] configure by passing --parameters
-* DONE [#B] UNTESTED allow for running on ARM host
+* DONE offer pre-built binaries
+* DONE configure by passing --parameters
+* DONE UNTESTED allow for running on ARM host
 * DONE clean up script
 * DONE clean up binaries and bundled files
 * DONE organize patches by corresponding sources
