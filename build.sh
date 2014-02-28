@@ -13,7 +13,7 @@ CWD=$(pwd)
 IMG_NAME=${IMG_NAME:-"SlackwareARM_cubitruck"}
 VERSION=${VERSION:-0.2}
 COMPILE=${COMPILE:-"false"}
-DEST=${DEST:-~/cubieslack}
+DEST=${DEST:-$CWD/dist}
 CUBIETRUCK_DISPLAY=${CUBIETRUCK_DISPLAY:-"HDMI"}  # "HDMI" or "VGA"
 IMAGE_SIZE_MB=${IMAGE_SIZE_MB:-2000}
 SLACKWARE_VERSION=${SLACKWARE_VERSION:-14.1}
@@ -136,7 +136,7 @@ if [ "$COMPILE" = "true" ]; then
     echo "--------------------------------------------------------------------------------"
     echo "Clone / Pull sources and patch"
     echo "--------------------------------------------------------------------------------"
-    mkdir -p $DEST/output
+    mkdir -p $DEST/image
 
     # Boot loader
     if [ -d "$DEST/u-boot-sunxi" ]; then
@@ -246,8 +246,8 @@ fi
 echo "--------------------------------------------------------------------------------"
 echo "Creating SD Image"
 echo "--------------------------------------------------------------------------------"
-mkdir -p $DEST/output
-cd $DEST/output
+mkdir -p $DEST/image
+cd $DEST/image
 
 echo "create image and mount image to next free loop device"
 dd if=/dev/zero of=${IMG_NAME}-${VERSION}_rootfs_SD.raw bs=1M count=$IMAGE_SIZE_MB
@@ -272,8 +272,8 @@ echo "create filesystem"
 mkfs.ext4 $LOOP1
 
 echo "create mount point and mount image"
-mkdir -p $DEST/output/sdcard/
-mount $LOOP1 $DEST/output/sdcard/
+mkdir -p $DEST/image/sdcard/
+mount $LOOP1 $DEST/image/sdcard/
 
 
 
@@ -284,12 +284,12 @@ mount $LOOP1 $DEST/output/sdcard/
 
 
 echo "------ Get basic Slackware System"
-cd $DEST/output/sdcard/
+cd $DEST/image/sdcard/
 [ ! -e $CWD/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz ] && wget -c ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/roots/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz -O $CWD/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz
 tar xf $CWD/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz
 
 echo "Configuring Slackware"
-cat > $DEST/output/sdcard/etc/motd <<EOF
+cat > $DEST/image/sdcard/etc/motd <<EOF
 	      _      _        _                       _
   ___  _   _ | |__  (_)  ___ | |_  _ __  _   _   ___ | | __
  / __|| | | || '_ \ | | / _ \| __|| '__|| | | | / __|| |/ /
@@ -300,30 +300,30 @@ cat > $DEST/output/sdcard/etc/motd <<EOF
 EOF
 
 echo "install script to turn off the LED blinking"
-cp $CWD/scripts/disable_led.sh $DEST/output/sdcard/bin/disable_led.sh
-chmod +x $DEST/output/sdcard/bin/disable_led.sh
+cp $CWD/scripts/disable_led.sh $DEST/image/sdcard/bin/disable_led.sh
+chmod +x $DEST/image/sdcard/bin/disable_led.sh
 
-cat <<EOF >> $DEST/output/sdcard/etc/rc.d/rc.local
+cat <<EOF >> $DEST/image/sdcard/etc/rc.d/rc.local
 
 # Uncomment the following line to turn off the leds after booting
 # /bin/disable_led.sh
 EOF
 
 echo "scripts for autoresize at first boot from cubian"
-cp $CWD/scripts/resize2fs-arch.sh $DEST/output/sdcard/root/resize2fs-root.sh
-chmod +x $DEST/output/sdcard/root/resize2fs-root.sh
+cp $CWD/scripts/resize2fs-arch.sh $DEST/image/sdcard/root/resize2fs-root.sh
+chmod +x $DEST/image/sdcard/root/resize2fs-root.sh
 
 echo "set hostname"
-echo darkstar > $DEST/output/sdcard/etc/HOSTNAME
+echo darkstar > $DEST/image/sdcard/etc/HOSTNAME
 
 echo "setup fstab"
 ### declare root partition in fstab
-echo '/dev/mmcblk0p1	/	ext4	defaults		1	1' >> $DEST/output/sdcard/etc/fstab
+echo '/dev/mmcblk0p1	/	ext4	defaults		1	1' >> $DEST/image/sdcard/etc/fstab
 ### mount /tmp as tmpfs
-echo 'tmpfs	/tmp	tmpfs	defaults,nosuid,size=30%	0	0' >> $DEST/output/sdcard/etc/fstab
+echo 'tmpfs	/tmp	tmpfs	defaults,nosuid,size=30%	0	0' >> $DEST/image/sdcard/etc/fstab
 
 echo "modules to load"
-cat >> $DEST/output/sdcard/etc/rc.d/rc.modules <<EOT
+cat >> $DEST/image/sdcard/etc/rc.d/rc.modules <<EOT
 #!/bin/sh
 
 /sbin/modprobe hci_uart
@@ -351,32 +351,32 @@ echo "setup video output"
 echo $CUBIETRUCK_DISPLAY
 case $CUBIETRUCK_DISPLAY in
     VGA)				# VGA
-	cp $BINARIES_DIR/cubie_configs/script-vga.bin $DEST/output/sdcard/boot/script.bin
+	cp $BINARIES_DIR/cubie_configs/script-vga.bin $DEST/image/sdcard/boot/script.bin
 	;;
     HDMI)				# HDMI
-	cp $BINARIES_DIR/cubie_configs/script-hdmi.bin $DEST/output/sdcard/boot/script.bin
+	cp $BINARIES_DIR/cubie_configs/script-hdmi.bin $DEST/image/sdcard/boot/script.bin
 	;;
     *) exit 1
 esac
 
 echo "Installing kernel"
-cp $BINARIES_DIR/linux-sunxi/uImage $DEST/output/sdcard/boot/
-cp -R $BINARIES_DIR/linux-sunxi/modules $DEST/output/sdcard/lib/
-cp -R $BINARIES_DIR/linux-sunxi/firmware/ $DEST/output/sdcard/lib/
+cp $BINARIES_DIR/linux-sunxi/uImage $DEST/image/sdcard/boot/
+cp -R $BINARIES_DIR/linux-sunxi/modules $DEST/image/sdcard/lib/
+cp -R $BINARIES_DIR/linux-sunxi/firmware/ $DEST/image/sdcard/lib/
 
 sync
 
 sleep 3
 
 echo "umount images"
-umount -d -l $DEST/output/sdcard/
+umount -d -l $DEST/image/sdcard/
 losetup -d $LOOP1
 losetup -d $LOOP0
 
 echo "cleaning"
-rm -r $DEST/output/sdcard/
+rm -r $DEST/image/sdcard/
 
 if [ "$COMPRESS" = "true" ]; then
     echo "compress image"
-    xz -z $DEST/output/${IMG_NAME}-${VERSION}_rootfs_SD.raw
+    xz -z $DEST/image/${IMG_NAME}-${VERSION}_rootfs_SD.raw
 fi
