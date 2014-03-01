@@ -12,7 +12,8 @@ CWD=$(pwd)
 # --- Configuration -------------------------------------------------------------
 IMG_NAME=${IMG_NAME:-"SlackwareARM_cubitruck"}
 VERSION=${VERSION:-0.3}
-COMPILE=${COMPILE:-"false"}
+COMPILE_BINARIES=${COMPILE_BINARIES:-"false"}
+DOWNLOAD_BINARIES=${DOWNLOAD_BINARIES:-"true"}
 CREATE_IMAGE=${CREATE_IMAGE:-"true"}
 DEST=${DEST:-$CWD/dist}
 CUBIETRUCK_DISPLAY=${CUBIETRUCK_DISPLAY:-"HDMI"}
@@ -31,6 +32,18 @@ function prepare_dest() {
     mkdir -p $DEST
 }
 
+function download_and_install_binaries() {
+    echo ". install binaries"
+    cd $DEST/image/sdcard/
+    if [ ! -e $CWD/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz ]; then
+	echo ". . downloading binaries"
+	wget -c https://bitbucket.org/gwenhael/cubietruck-slackware/downloads/binaries-$VERSION.tar.xz \
+	     -O $CWD/binaries-$VERSION.tar.xz
+    fi
+    echo ". . extracting binaries"
+    tar xf $CWD/binaries-$VERSION.tar.xz
+}
+
 function setup_x_toolchain() {
     echo ". setting up cross-compiler if needed"
     if $(uname -m | grep -q arm); then
@@ -42,7 +55,8 @@ function setup_x_toolchain() {
 	if [ ! -e $PWD/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux/ ]; then
 	    if [ ! -e $CWD/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux.tar.xz ]; then
 		echo ". . downloading cross-compiler"
-		wget -c https://launchpadlibrarian.net/$TOOLCHAIN_URL_RANDOM_NUMBER/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux.tar.xz -O $CWD/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux.tar.xz
+		wget -c https://launchpadlibrarian.net/$TOOLCHAIN_URL_RANDOM_NUMBER/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux.tar.xz \
+		     -O $CWD/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux.tar.xz
 	    fi
 	    echo ". . installing cross-compiler locally"
 	    tar xf $CWD/gcc-linaro-arm-linux-gnueabihf-${TOOLCHAIN_VERSION}_linux.tar.xz
@@ -219,12 +233,13 @@ function compress_image() {
     xz -z $DEST/image/${IMG_NAME}-${VERSION}_rootfs_SD.raw
 }
 
-function get_and_install_minirootfs() {
+function download_and_install_minirootfs() {
     echo ". install minirootds"
     cd $DEST/image/sdcard/
     if [ ! -e $CWD/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz ]; then
 	echo ". . downloading minirootfs"
-	wget -c ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/roots/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz -O $CWD/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz
+	wget -c ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/roots/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz \
+	     -O $CWD/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz
     fi
     echo ". . extracting minirootfs"
     tar xf $CWD/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz
@@ -346,22 +361,39 @@ EOF
     fi
 }
 
+function clean_image() {
+    rm $DEST/image/*
+}
+
+function clean_binaries() {
+    rm -r $DEST/binaries/*
+}
+
+
 # commandline arguments processing
 while [ "x$1" != "x" ]
 do
     case "$1" in
+	-b | --binaries )
+	    shift
+	    DOWNLOAD_BINARIES="true"
+	    COMPILE_BINARIES="false"
+	    ;;
 	--clean )
 	    shift
 	    clean_sources
+	    clean_binaries
+	    clean_image
 	    exit -1
 	    ;;
 	-c | --compile )
 	    shift
-	    COMPILE="true"
+	    COMPILE_BINARIES="true"
+	    DOWNLOAD_BINARIES="false"
 	    ;;
 	-dc | --dont-compile )
 	    shift
-	    COMPILE="false"
+	    COMPILE_BINARIES="false"
 	    ;;
 	-d | --display )
 	    shift
@@ -424,22 +456,51 @@ do
 	    echo -e "Usage: run as root: $0 <options>"
 	    echo -e "Options:"
 	    echo -e "\t--clean"
+	    echo -e "\t\tclean sources, remove binaries and image"
+
+	    echo -e "\t-b | --binaries"
+	    echo -e "\t\tdownload and use pre-built binaries"
+
 	    echo -e "\t-c | --compile"
+	    echo -e "\t\tbuild binaries locally"
+
 	    echo -e "\t-dc | --dont-compile (default)"
+	    echo -e "\t\tskip compilation"
+
 	    echo -e "\t-i | --create-image (default)"
+	    echo -e "\t\tgenerate image"
+
 	    echo -e "\t-ni | --no-image"
+	    echo -e "\t\tskip image generation"
+
 	    echo -e "\t-d | --display [\"HDMI\"|\"VGA\"] (default: $CUBIETRUCK_DISPLAY)"
+	    echo -e "\t\tconfiguration image video output"
+
 	    echo -e "\t-gz | --compress (default: no)"
+	    echo -e "\t\tcompress image (takes time)"
+
 	    echo -e "\t-n | --image-name [\"nom\"] (default: $IMG_NAME)"
+	    echo -e "\t\tname the image"
+
 	    echo -e "\t-r | --rootfs-version [\"version number\"] (default: $ROOTFS_VERSION)"
+	    echo -e "\t\tversion of the minirootfs"
+
 	    echo -e "\t-s | --image-size [size in MB] (default: $IMAGE_SIZE_MB)"
+	    echo -e "\t\tsize of the image (see resizefs script in image)"
+
 	    echo -e "\t-o | --output [/directory/] (default: $DEST)"
+	    echo -e "\t\tdirectory where the image will be generated"
+
 	    echo -e "\t--package-binaries"
 	    echo -e "\t\tpackage compiled binaries into $BINARIES_DIR-$VERSION.tar.xz"
 	    echo -e "\t\t(combine with --compile)"
+
 	    echo -e "\t-v | --image-version [\"version number\"] (default: $VERSION)"
+	    echo -e "\t\tversion the image"
+
 	    echo -e "\t-xv | --toolchain-version [\"version number\"] (default: $TOOLCHAIN_VERSION)"
 	    echo -e "\t-xumn | --toolchain-url-magic-number [\"magic number\"] (default: $TOOLCHAIN_URL_RANDOM_NUMBER)"
+	    echo -e "\t\tversion of the cross-compiler"
 
 	    exit 0
 	    ;;
@@ -449,11 +510,15 @@ done
 # --- Script --------------------------------------------------------------------
 prepare_dest
 
-if [ "$COMPILE" = "true" ]; then
+if [ "$COMPILE_BINARIES" = "true" ]; then
     setup_x_toolchain
     clone_pull_patch_sources
     clean_sources
     compile
+else
+    if [ "$DOWNLOAD_BINARIES" = "true"]; then
+	download_and_install_binaries
+    fi
 fi
 
 [ "$PACKAGE_BINARIES" = "true" ] && pack_binaries && exit -1
@@ -469,7 +534,7 @@ fi
 
 if [ "$CREATE_IMAGE" = "true" ]; then
     create_and_mount_image
-    get_and_install_minirootfs
+    download_and_install_minirootfs
     configure_slackwarearm
     install_kernel_and_boot
     umount_image
