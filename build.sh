@@ -338,28 +338,86 @@ EOT
 
 
 echo "remove the preconfigured boot and setup ours"
-rm -rf $DEST/image/sdcard/boot/
-mkdir -p $DEST/image/sdcard/boot/
-cat <<EOF > $DEST/image/sdcard/boot/uEnv.txt
-root=/dev/mmcblk0p1
+rm -rf $DEST/image/sdcard/boot/*
+
+if [ -x /sbin/makepkg ] && [ -x /sbin/installpkg ]; then
+    mkdir -p $DEST/pkg-linux-sunxi/{boot,lib}/
+
+    cat <<EOF > $DEST/pkg-linux-sunxi/boot/uEnv.txt
+root=/dev/mmcblk0p1 ro rootwait
 extraargs=console=tty0,115200 sunxi_no_mali_mem_reserve sunxi_g2d_mem_reserve=0 sunxi_ve_mem_reserve=0 hdmi.audio=EDID:0 disp.screen0_output_mode=EDID:1280x720p50 rootwait
 panic=10 rootfstype=ext4 rootflags=discard
 EOF
 
-echo "setup video output"
-cp $BINARIES_DIR/cubie_configs/script-*.bin $DEST/image/sdcard/boot/
-( cd $DEST/image/sdcard/boot/
-  case $CUBIETRUCK_DISPLAY in
-      VGA) ln script-vga.bin script.bin
-	  ;;
-      HDMI) ln script-hdmi.bin script.bin
-	  ;;
-  esac )
+    cp $BINARIES_DIR/cubie_configs/script-*.bin $DEST/pkg-linux-sunxi/boot/
+    ( cd $DEST/pkg-linux-sunxi/boot/
+      case $CUBIETRUCK_DISPLAY in
+	  VGA) rm script.bin
+	       ln script-vga.bin script.bin
+	       break
+	       ;;
+	  HDMI) rm script.bin
+		ln script-hdmi.bin script.bin
+		break
+		;;
+      esac )
 
-echo "Installing kernel"
-cp $BINARIES_DIR/linux-sunxi/uImage $DEST/image/sdcard/boot/
-cp -R $BINARIES_DIR/linux-sunxi/modules $DEST/image/sdcard/lib/
-cp -R $BINARIES_DIR/linux-sunxi/firmware/ $DEST/image/sdcard/lib/
+    cp $BINARIES_DIR/linux-sunxi/uImage $DEST/pkg-linux-sunxi/boot/
+    cp -R $BINARIES_DIR/linux-sunxi/modules $DEST/pkg-linux-sunxi/lib/
+    cp -R $BINARIES_DIR/linux-sunxi/firmware/ $DEST/pkg-linux-sunxi/lib/
+
+    mkdir -p $DEST/pkg-linux-sunxi/install/
+    PRGNAM=linux-sunxi
+    cat <<EOF > $DEST/pkg-linux-sunxi/install/slack-desc
+$PRGNAM: $PRGNAM (Linux sunxi kernel)
+$PRGNAM:
+$PRGNAM: Linux is a clone of the operating system Unix, written from scratch by
+$PRGNAM: Linus Torvalds with assistance from a loosely-knit team of hackers
+$PRGNAM: across the Net. It aims towards POSIX and Single UNIX Specification
+$PRGNAM: compliance.
+$PRGNAM:
+$PRGNAM: It has all the features you would expect in a modern fully-fledged Unix
+$PRGNAM:
+$PRGNAM: http://github.com/linux-sunxi/linux-sunxi
+$PRGNAM:
+EOF
+
+    VERSION=$(cat $DEST/linux-sunxi/Makefile | grep "^VERSION" | sed "s|^VERSION = \(.*\)$|\1|g")
+    VERSION=$VERSION.$(cat $DEST/linux-sunxi/Makefile | grep "^PATCHLEVEL" | sed "s|^PATCHLEVEL = \(.*\)$|\1|g")
+    VERSION=$VERSION.$(cat $DEST/linux-sunxi/Makefile | grep "^SUBLEVEL" | sed "s|^SUBLEVEL = \(.*\)$|\1|g")
+    # VERSION=$VERSION.$(cat $DEST/linux-sunxi/Makefile | grep "^EXTRAVERSION" | sed "s|^EXTRAVERSION = \(.*\)$|\1|g")
+    ARCH=arm
+    BUILD=1
+    TAG=cyco
+
+    ( cd $DEST/pkg-linux-sunxi
+
+      makepkg -l y -c n $DEST/image/sdcard/root/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+    )
+
+    installpkg --root $DEST/image/sdcard/ $DEST/image/sdcard/root/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+else
+    cat <<EOF > $DEST/image/sdcard/boot/uEnv.txt
+root=/dev/mmcblk0p1 ro rootwait
+extraargs=console=tty0,115200 sunxi_no_mali_mem_reserve sunxi_g2d_mem_reserve=0 sunxi_ve_mem_reserve=0 hdmi.audio=EDID:0 disp.screen0_output_mode=EDID:1280x720p50 rootwait
+panic=10 rootfstype=ext4 rootflags=discard
+EOF
+
+    echo "setup video output"
+    cp $BINARIES_DIR/cubie_configs/script-*.bin $DEST/image/sdcard/boot/
+    ( cd $DEST/image/sdcard/boot/
+      case $CUBIETRUCK_DISPLAY in
+	  VGA) ln script-vga.bin script.bin
+	       ;;
+	  HDMI) ln script-hdmi.bin script.bin
+		;;
+      esac )
+
+    echo "Installing kernel"
+    cp $BINARIES_DIR/linux-sunxi/uImage $DEST/image/sdcard/boot/
+    cp -R $BINARIES_DIR/linux-sunxi/modules $DEST/image/sdcard/lib/
+    cp -R $BINARIES_DIR/linux-sunxi/firmware/ $DEST/image/sdcard/lib/
+fi
 
 sync
 

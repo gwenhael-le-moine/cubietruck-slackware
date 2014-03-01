@@ -25,11 +25,6 @@ Installation steps Slackware for Cubietruck
 99. Enjoy Slackware :)
 
 
----------------------------------------------------------
-Peculiarities
----------------------------------------------------------
-* / is mount read-write from the start and this disturbs /etc/rc.d/rc.S so there will be a warning message during boot. Just press Enter to continue booting
-
 
 ---------------------------------------------------------
 FAQ

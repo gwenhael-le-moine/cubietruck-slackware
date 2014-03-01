@@ -1,12 +1,13 @@
 # --- TODO
 
-* TODO [#A] in order of preference try kernel.org, linux-sinxi kernels to replace patwood
+* TODO [#A] try kernel.org kernel
+* TODO [#A] detail post-install instruction
 * TODO [#A] add --clean
 * TODO [#B] build rootfs from slackwarearm-current
    ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/scripts/
 * TODO [#B] compile out-of-tree
 * TODO [#B] switch userland to hard-float binaries
-* TODO [#B] package the kernel in a real slackware package
+* DONE package the kernel in a real slackware package
 * DONE offer pre-built binaries
 * DONE configure by passing --parameters
 * DONE UNTESTED allow for running on ARM host
