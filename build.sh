@@ -192,7 +192,6 @@ if [ "$COMPILE" = "true" ]; then
     $BINARIES_DIR/sunxi-tools/fex2bin $DEST/cubie_configs/sysconfig/linux/ct-vga.fex $BINARIES_DIR/cubie_configs/script-vga.bin
     $BINARIES_DIR/sunxi-tools/fex2bin $DEST/cubie_configs/sysconfig/linux/ct-hdmi.fex $BINARIES_DIR/cubie_configs/script-hdmi.bin
 
-    # Patwood's kernel 3.4.75+
     if [ -d "$DEST/linux-sunxi" ]; then
 	( cd $DEST/linux-sunxi;
 	  git pull -f )
