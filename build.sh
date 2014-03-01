@@ -224,7 +224,7 @@ if [ "$COMPILE" = "true" ]; then
 else
     if [ ! -e $BINARIES_DIR ]; then
 	echo "ERROR"
-	echo "Necesary binaries files not present !"
+	echo "Necessary binaries files not present !"
 	echo "Either run $0 --compile or download them from https://bitbucket.org/gwenhael/cubietruck-slackware/downloads"
 	echo "and untar them here."
 
