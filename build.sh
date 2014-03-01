@@ -347,16 +347,14 @@ panic=10 rootfstype=ext4 rootflags=discard
 EOF
 
 echo "setup video output"
-echo $CUBIETRUCK_DISPLAY
-case $CUBIETRUCK_DISPLAY in
-    VGA)				# VGA
-	cp $BINARIES_DIR/cubie_configs/script-vga.bin $DEST/image/sdcard/boot/script.bin
-	;;
-    HDMI)				# HDMI
-	cp $BINARIES_DIR/cubie_configs/script-hdmi.bin $DEST/image/sdcard/boot/script.bin
-	;;
-    *) exit 1
-esac
+cp $BINARIES_DIR/cubie_configs/script-*.bin $DEST/image/sdcard/boot/
+( cd $DEST/image/sdcard/boot/
+  case $CUBIETRUCK_DISPLAY in
+      VGA) ln script-vga.bin script.bin
+	  ;;
+      HDMI) ln script-hdmi.bin script.bin
+	  ;;
+  esac )
 
 echo "Installing kernel"
 cp $BINARIES_DIR/linux-sunxi/uImage $DEST/image/sdcard/boot/
