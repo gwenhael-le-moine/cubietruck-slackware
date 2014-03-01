@@ -25,10 +25,22 @@ PACKAGE_BINARIES=false
 
 BINARIES_DIR=$CWD/binaries
 
+function cleanall() {
+    for i in u-boot-sunxi sunxi-tools linux-sunxi; do
+	( cd $DEST/$i
+	  make clean CROSS_COMPILE=$CROSS_COMPILE )
+    done
+}
+
 # commandline arguments processing
 while [ "x$1" != "x" ]
 do
     case "$1" in
+	--clean )
+	    shift
+	    cleanall
+	    exit -1
+	    ;;
 	-c | --compile )
 	    shift
 	    COMPILE="true"
@@ -89,6 +101,7 @@ do
 	-h | --help )
 	    echo -e "Usage: run as root: $0 <options>"
 	    echo -e "Options:"
+	    echo -e "\t--clean"
 	    echo -e "\t-c | --compile"
 	    echo -e "\t-dc | --dont-compile (default)"
 	    echo -e "\t-d | --display [\"HDMI\"|\"VGA\"] (default: $CUBIETRUCK_DISPLAY)"
@@ -97,7 +110,7 @@ do
 	    echo -e "\t-r | --rootfs-version [\"version number\"] (default: $ROOTFS_VERSION)"
 	    echo -e "\t-s | --image-size [size in MB] (default: $IMAGE_SIZE_MB)"
 	    echo -e "\t-o | --output [/directory/] (default: $DEST)"
-	    echo -e "\t     --package-binaries"
+	    echo -e "\t--package-binaries"
 	    echo -e "\t\tpackage compiled binaries into $BINARIES_DIR-$VERSION.tar.xz"
 	    echo -e "\t\t(combine with --compile)"
 	    echo -e "\t-v | --image-version [\"version number\"] (default: $VERSION)"
@@ -111,8 +124,6 @@ done
 
 # --- Script --------------------------------------------------------------------
 mkdir -p $DEST
-
-echo "Building Cubietruck-Slackware in $DEST from $CWD"
 
 if [ "$COMPILE" = "true" ]; then
     mkdir -p $BINARIES_DIR

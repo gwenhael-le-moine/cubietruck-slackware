@@ -1,11 +1,11 @@
 # --- TODO
 
-* TODO [#A] try kernel.org kernel
-* TODO [#A] add --clean
-* TODO [#B] build rootfs from slackwarearm-current
+* TODO [#B] try kernel.org kernel
+* TODO [#C] build rootfs from slackwarearm-current
    ftp://ftp.arm.slackware.com/slackwarearm/slackwarearm-devtools/minirootfs/scripts/
-* TODO [#B] compile out-of-tree
-* TODO [#B] switch userland to hard-float binaries
+* TODO [#C] compile out-of-tree
+* TODO [#C] switch userland to hard-float binaries
+* DONE add --clean
 * DONE package the kernel in a real slackware package
 * DONE offer pre-built binaries
 * DONE configure by passing --parameters
