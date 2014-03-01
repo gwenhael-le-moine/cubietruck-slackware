@@ -197,7 +197,7 @@ if [ "$COMPILE" = "true" ]; then
 	( cd $DEST/linux-sunxi;
 	  git pull -f )
     else
-	git clone https://github.com/patrickhwood/linux-sunxi $DEST/linux-sunxi
+	git clone https://github.com/linux-sunxi/linux-sunxi $DEST/linux-sunxi
     fi
     echo "------ Compiling kernel"
     ( cd $DEST/linux-sunxi
