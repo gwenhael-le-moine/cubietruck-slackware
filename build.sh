@@ -11,7 +11,7 @@ CWD=$(pwd)
 
 # --- Configuration -------------------------------------------------------------
 IMG_NAME=${IMG_NAME:-"SlackwareARM_cubitruck"}
-VERSION=${VERSION:-0.2}
+VERSION=${VERSION:-0.3}
 COMPILE=${COMPILE:-"false"}
 DEST=${DEST:-$CWD/dist}
 CUBIETRUCK_DISPLAY=${CUBIETRUCK_DISPLAY:-"HDMI"}  # "HDMI" or "VGA"
@@ -392,10 +392,10 @@ EOF
 
     ( cd $DEST/pkg-linux-sunxi
 
-      makepkg -l y -c n $DEST/image/sdcard/root/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+      makepkg -l y -c n $DEST/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
     )
 
-    installpkg --root $DEST/image/sdcard/ $DEST/image/sdcard/root/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+    installpkg --root $DEST/image/sdcard/ $DEST/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
 else
     cat <<EOF > $DEST/image/sdcard/boot/uEnv.txt
 root=/dev/mmcblk0p1 ro rootwait
