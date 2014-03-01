@@ -20,7 +20,7 @@ Installation steps Slackware for Cubietruck
 
 8. cd dist/image/
 
-9. dd if=<image>.raw of=/dev/mmcblk0 bs=1024
+9. cat <image>.raw /dev/mmcblk0
 
 99. Enjoy Slackware :)
 
