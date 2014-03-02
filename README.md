@@ -24,13 +24,16 @@ Installation steps Slackware for Cubietruck
 
 99. Enjoy Slackware :)
 
-
-
 ---------------------------------------------------------
 FAQ
 ---------------------------------------------------------
 * default root password is 'password'
+* you have to manually install l/mpfr
 
+---------------------------------------------------------
+Bugs
+---------------------------------------------------------
+* Wifi is not working
 
 ---
 Forked from the following:
