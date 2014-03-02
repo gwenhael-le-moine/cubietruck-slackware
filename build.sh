@@ -325,6 +325,7 @@ EOF
 /sbin/modprobe mali
 #/sbin/modprobe sunxi_gmac
 EOT
+    chmod +x $DEST$TARGET/etc/rc.d/rc.modules
 
     if [ -x /sbin/makepkg ] && [ -x /sbin/installpkg ]; then
 	echo ". . build slackware package for kernel"
