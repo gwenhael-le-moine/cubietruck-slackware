@@ -115,7 +115,9 @@ function clone_pull_patch_sources() {
 	  git pull -f )
     else
 	echo ". . updating linux-sunxi"
-	git clone https://github.com/linux-sunxi/linux-sunxi $DEST/linux-sunxi
+	# git clone https://github.com/linux-sunxi/linux-sunxi $DEST/linux-sunxi
+	# git clone https://github.com/cubieboard2/linux-sunxi $DEST/linux-sunxi
+	git clone https://github.com/cubieboard/linux-sunxi $DEST/linux-sunxi
     fi
 }
 
