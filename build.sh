@@ -301,7 +301,7 @@ EOF
     echo ". . setup video output"
     cp $BINARIES_DIR/cubie_configs/script-*.bin $DEST$TARGET/boot/
     ( cd $DEST$TARGET/boot/
-      rm script.bin
+      [ -e script.bin ] && rm script.bin
       case $CUBIETRUCK_DISPLAY in
 	  VGA) ln script-vga.bin script.bin
 	       ;;
