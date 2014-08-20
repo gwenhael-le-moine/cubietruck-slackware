@@ -5,6 +5,7 @@ set -e
 # Requires root ..
 if [ "$UID" -ne 0 ]; then
     echo "Please run as root"
+    exit 1
 fi
 
 CWD=$(pwd)
