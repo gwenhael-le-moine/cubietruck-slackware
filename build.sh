@@ -79,9 +79,6 @@ function clone_pull_patch_sources() {
     else
 	echo ". . cloning u-boot-sunxi"
 	git clone https://github.com/cubieboard/u-boot-sunxi $DEST/u-boot-sunxi
-
-	echo ". . patching u-boot-sunxi to detect Cubietruck's 2GiB of RAM"
-	patch -f $DEST/u-boot-sunxi/include/configs/sunxi-common.h < $CWD/patches/u-boot-sunxi/memory.patch || true
     fi
 
     # Allwinner tools
