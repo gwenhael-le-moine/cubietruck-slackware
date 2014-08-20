@@ -519,7 +519,7 @@ if [ "$COMPILE_BINARIES" = "true" ]; then
     clean_sources
     compile
 else
-    if [ "$DOWNLOAD_BINARIES" = "true"]; then
+    if [ "$DOWNLOAD_BINARIES" = "true" ]; then
 	download_and_install_binaries
     fi
 fi
