@@ -14,13 +14,11 @@ Installation steps Slackware for Cubietruck
 
 5. cd cubietruck-slackware
 
-6. chmod +x build.sh
+6. ./build.sh # see build.sh --help
 
-7. ./build.sh # see build.sh --help
+7. cd dist/image/
 
-8. cd dist/image/
-
-9. cat <image>.raw /dev/mmcblk0
+8. cat <image>.raw /dev/mmcblk0
 
 99. Enjoy Slackware :)
 
