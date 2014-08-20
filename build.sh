@@ -37,7 +37,7 @@ function download_and_install_binaries() {
     echo ". install binaries"
     mkdir -p $DEST/image/sdcard/
     cd $DEST/image/sdcard/
-    if [ ! -e $CWD/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz ]; then
+    if [ ! -e $CWD/binaries-$VERSION.tar.xz ]; then
 	echo ". . downloading binaries"
 	wget -c https://bitbucket.org/gwenhael/cubietruck-slackware/downloads/binaries-$VERSION.tar.xz \
 	     -O $CWD/binaries-$VERSION.tar.xz
