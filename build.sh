@@ -35,6 +35,7 @@ function prepare_dest() {
 
 function download_and_install_binaries() {
     echo ". install binaries"
+    mkdir -p $DEST/image/sdcard/
     cd $DEST/image/sdcard/
     if [ ! -e $CWD/slack-$SLACKWARE_VERSION-miniroot_$ROOTFS_VERSION.tar.xz ]; then
 	echo ". . downloading binaries"
