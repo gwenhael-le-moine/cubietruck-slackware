@@ -24,6 +24,13 @@ ROOTFS_VERSION=${ROOTFS_VERSION:-21Jul14}
 TOOLCHAIN_VERSION=${TOOLCHAIN_VERSION:-4.8-2013.10}
 TOOLCHAIN_URL_RANDOM_NUMBER=${TOOLCHAIN_URL_RANDOM_NUMBER:-155358238}
 
+REPO_UBOOT=${REPO_UBOOT:-https://github.com/cubieboard/u-boot-sunxi}
+REPO_SUNXI_TOOLS=${REPO_SUNXI_TOOLS:-https://github.com/linux-sunxi/sunxi-tools.git}
+REPO_CONFIGS=${REPO_CONFIGS:-https://github.com/cubieboard/cubie_configs}
+REPO_LINUX=${REPO_LINUX:-https://github.com/linux-sunxi/linux-sunxi}
+# REPO_LINUX=${REPO_LINUX:-https://github.com/cubieboard2/linux-sunxi}
+# REPO_LINUX=${REPO_LINUX:-https://github.com/cubieboard/linux-sunxi}
+
 PACKAGE_BINARIES="false"
 
 BINARIES_DIR=$CWD/binaries
@@ -78,7 +85,7 @@ function clone_pull_patch_sources() {
 	  git pull )
     else
 	echo ". . cloning u-boot-sunxi"
-	git clone https://github.com/cubieboard/u-boot-sunxi $DEST/u-boot-sunxi
+	git clone $REPO_UBOOT $DEST/u-boot-sunxi
     fi
 
     # Allwinner tools
@@ -88,7 +95,7 @@ function clone_pull_patch_sources() {
 	  git pull )
     else
 	echo ". . cloning sunxi-tools"
-	git clone https://github.com/linux-sunxi/sunxi-tools.git $DEST/sunxi-tools
+	git clone $REPO_SUNXI_TOOLS $DEST/sunxi-tools
     fi
 
     # Hardware configurations
@@ -98,7 +105,7 @@ function clone_pull_patch_sources() {
 	  git pull )
     else
 	echo ". . cloning sunxi-tools"
-	git clone https://github.com/cubieboard/cubie_configs $DEST/cubie_configs
+	git clone $REPO_CONFIGS $DEST/cubie_configs
 
 	echo ". . patching sunxi-tools"
 	# Applying Patch for high load. Could cause troubles with USB OTG port
@@ -115,9 +122,7 @@ function clone_pull_patch_sources() {
 	  git pull -f )
     else
 	echo ". . updating linux-sunxi"
-	# git clone https://github.com/linux-sunxi/linux-sunxi $DEST/linux-sunxi
-	# git clone https://github.com/cubieboard2/linux-sunxi $DEST/linux-sunxi
-	git clone https://github.com/cubieboard/linux-sunxi $DEST/linux-sunxi
+	git clone $REPO_LINUX $DEST/linux-sunxi
     fi
 }
 
@@ -342,7 +347,7 @@ $PRGNAM: compliance.
 $PRGNAM:
 $PRGNAM: It has all the features you would expect in a modern fully-fledged Unix
 $PRGNAM:
-$PRGNAM: http://github.com/linux-sunxi/linux-sunxi
+$PRGNAM: $REPO_LINUX
 $PRGNAM:
 EOF
 
