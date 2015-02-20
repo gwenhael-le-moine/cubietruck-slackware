@@ -140,6 +140,7 @@ function compile() {
     mkdir -p $BINARIES_DIR
 
     ( cd $DEST/u-boot-sunxi
+      cp $CWD/config/kernel.config $DEST/u-boot-sunxi/include/linux/config.h
       echo ". . compiling u-boot-sunxi"
       make -j2 'cubietruck' CROSS_COMPILE=$CROSS_COMPILE
       make HOSTCC=gcc CROSS_COMPILE='' tools
