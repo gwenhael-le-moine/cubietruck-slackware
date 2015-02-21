@@ -230,9 +230,6 @@ function umount_image() {
     umount -d -l $DEST/image/sdcard/
     losetup -d $LOOP1
     losetup -d $LOOP0
-
-    echo "cleaning"
-    rm -r $DEST/image/sdcard/
 }
 
 function compress_image() {
